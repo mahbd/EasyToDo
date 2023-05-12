@@ -49,6 +49,7 @@ public class LoginForm extends Fragment {
                     prefs.edit().putString("access", token.getAccess()).apply();
                     prefs.edit().putString("refresh", token.getRefresh()).apply();
                 } else {
+                    binding.etPassword.setError("Invalid Credentials");
                     Toast.makeText(getContext(), "Login Failed", Toast.LENGTH_LONG).show();
                 }
             });

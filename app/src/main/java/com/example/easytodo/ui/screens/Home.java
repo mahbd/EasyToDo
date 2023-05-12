@@ -24,7 +24,7 @@ public class Home extends Fragment {
 
         binding.btnLogin.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
-            navController.navigate(R.id.nav_login_form);
+            navController.navigate(R.id.nav_register_form);
         });
 
         return root;
