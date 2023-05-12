@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.example.easytodo.ui.screens.Home"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_task"
+        android:name="com.example.easytodo.ui.screens.Task"
+        android:label="Tasks"
+        tools:layout="@layout/fragment_task" />
+
+    <fragment
+        android:id="@+id/nav_project"
+        android:name="com.example.easytodo.ui.screens.Project"
+        android:label="Projects"
+        tools:layout="@layout/fragment_project" />
+
+    <fragment
+        android:id="@+id/nav_tag"
+        android:name="com.example.easytodo.ui.screens.Tag"
+        android:label="Tags"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_share"
+        android:name="com.example.easytodo.ui.screens.Share"
+        android:label="Share"
+        tools:layout="@layout/fragment_share" />
+
+    <fragment
+        android:id="@+id/nav_privacy"
+        android:name="com.example.easytodo.ui.screens.Privacy"
+        android:label="Privacy"
+        tools:layout="@layout/fragment_privacy" />
+</navigation>
