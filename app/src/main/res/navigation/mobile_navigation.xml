@@ -40,4 +40,16 @@
         android:name="com.example.easytodo.ui.screens.Privacy"
         android:label="Privacy"
         tools:layout="@layout/fragment_privacy" />
+
+    <fragment
+        android:id="@+id/nav_login_form"
+        android:name="com.example.easytodo.ui.forms.LoginForm"
+        android:label="Login"
+        tools:layout="@layout/fragment_privacy" />
+
+    <fragment
+        android:id="@+id/nav_register_form"
+        android:name="com.example.easytodo.ui.forms.RegisterForm"
+        android:label="Register"
+        tools:layout="@layout/fragment_privacy" />
 </navigation>

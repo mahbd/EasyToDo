@@ -7,7 +7,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
+import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentHomeBinding;
 
 
@@ -18,6 +21,11 @@ public class Home extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        binding.btnLogin.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+            navController.navigate(R.id.nav_login_form);
+        });
 
         return root;
     }
