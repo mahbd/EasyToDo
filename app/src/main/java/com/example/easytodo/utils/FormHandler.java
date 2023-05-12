@@ -1,4 +1,4 @@
-package com.example.easytodo.models;
+package com.example.easytodo.utils;
 
 import android.widget.CheckBox;
 import android.widget.EditText;

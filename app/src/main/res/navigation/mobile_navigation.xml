@@ -7,37 +7,37 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.easytodo.ui.screens.Home"
+        android:name="com.example.easytodo.ui.screens.HomeScreen"
         android:label="Home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_task"
-        android:name="com.example.easytodo.ui.screens.Task"
+        android:name="com.example.easytodo.ui.screens.TaskScreen"
         android:label="Tasks"
         tools:layout="@layout/fragment_task" />
 
     <fragment
         android:id="@+id/nav_project"
-        android:name="com.example.easytodo.ui.screens.Project"
+        android:name="com.example.easytodo.ui.screens.ProjectScreen"
         android:label="Projects"
         tools:layout="@layout/fragment_project" />
 
     <fragment
         android:id="@+id/nav_tag"
-        android:name="com.example.easytodo.ui.screens.Tag"
+        android:name="com.example.easytodo.ui.screens.TagScreen"
         android:label="Tags"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_share"
-        android:name="com.example.easytodo.ui.screens.Share"
+        android:name="com.example.easytodo.ui.screens.ShareScreen"
         android:label="Share"
         tools:layout="@layout/fragment_share" />
 
     <fragment
         android:id="@+id/nav_privacy"
-        android:name="com.example.easytodo.ui.screens.Privacy"
+        android:name="com.example.easytodo.ui.screens.PrivacyScreen"
         android:label="Privacy"
         tools:layout="@layout/fragment_privacy" />
 
@@ -51,5 +51,29 @@
         android:id="@+id/nav_register_form"
         android:name="com.example.easytodo.ui.forms.RegisterForm"
         android:label="Register"
+        tools:layout="@layout/fragment_privacy" />
+
+    <fragment
+        android:id="@+id/nav_task_form"
+        android:name="com.example.easytodo.ui.forms.TaskForm"
+        android:label="Task Form"
+        tools:layout="@layout/fragment_privacy" />
+
+    <fragment
+        android:id="@+id/nav_project_form"
+        android:name="com.example.easytodo.ui.forms.ProjectForm"
+        android:label="Project Form"
+        tools:layout="@layout/fragment_privacy" />
+
+    <fragment
+        android:id="@+id/nav_tag_form"
+        android:name="com.example.easytodo.ui.forms.TagForm"
+        android:label="Tag Form"
+        tools:layout="@layout/fragment_privacy" />
+
+    <fragment
+        android:id="@+id/nav_share_form"
+        android:name="com.example.easytodo.ui.forms.ShareForm"
+        android:label="Share Form"
         tools:layout="@layout/fragment_privacy" />
 </navigation>

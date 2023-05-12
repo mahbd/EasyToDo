@@ -14,7 +14,7 @@ import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentHomeBinding;
 
 
-public class Home extends Fragment {
+public class HomeScreen extends Fragment {
     private FragmentHomeBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -24,7 +24,7 @@ public class Home extends Fragment {
 
         binding.btnLogin.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
-            navController.navigate(R.id.nav_register_form);
+            navController.navigate(R.id.nav_tag);
         });
 
         return root;

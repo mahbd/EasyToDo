@@ -8,15 +8,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.easytodo.databinding.FragmentShareBinding;
+import com.example.easytodo.databinding.FragmentSettingsBinding;
 
 
-public class Share extends Fragment {
-    private FragmentShareBinding binding;
+public class SettingsScreen extends Fragment {
+    private FragmentSettingsBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentShareBinding.inflate(inflater, container, false);
+        binding = FragmentSettingsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         return root;

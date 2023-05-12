@@ -13,7 +13,7 @@ import androidx.navigation.Navigation;
 
 import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentRegisterFormBinding;
-import com.example.easytodo.models.FormHandler;
+import com.example.easytodo.utils.FormHandler;
 import com.example.easytodo.models.User;
 import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.UserAPI;

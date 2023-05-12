@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.easytodo.databinding.FragmentTagFormBinding;
+import com.example.easytodo.models.Tag;
 
 
 public class TagForm extends Fragment {
@@ -18,6 +19,20 @@ public class TagForm extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTagFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        binding.btnAtSave.setOnClickListener(v -> {
+            String title = binding.etAtTitle.getText().toString();
+
+            if (Tag.exists(title)) {
+                binding.etAtTitle.setError("Tag already exists");
+                return;
+            }
+            binding.etAtTitle.setError(null);
+            Tag tag = new Tag(title);
+            tag.save();
+
+            requireActivity().onBackPressed();
+        });
 
         return root;
     }

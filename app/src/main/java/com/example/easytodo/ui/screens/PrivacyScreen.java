@@ -8,15 +8,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.easytodo.databinding.FragmentTaskBinding;
+import com.example.easytodo.databinding.FragmentPrivacyBinding;
 
 
-public class Task extends Fragment {
-    private FragmentTaskBinding binding;
+public class PrivacyScreen extends Fragment {
+    private FragmentPrivacyBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentTaskBinding.inflate(inflater, container, false);
+        binding = FragmentPrivacyBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         return root;
