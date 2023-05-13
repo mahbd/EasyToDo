@@ -6,13 +6,12 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ChangeAPI {
     @GET("changes/")
     Call<List<Change>> getChanges();
 
-    @GET("changes/?created_at_after={date}")
-    Call<List<Change>> getChangesAfter(@Path("date") String date);
+    @GET("changes/")
+    Call<List<Change>> getChangesAfter(@Query("created_at_after") String date);
 }

@@ -8,10 +8,14 @@ import androidx.preference.PreferenceManager;
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.models.Change;
+import com.example.easytodo.models.Project;
 import com.example.easytodo.models.Tag;
+import com.example.easytodo.models.Task;
 import com.example.easytodo.services.ChangeAPI;
 import com.example.easytodo.services.GenAPIS;
+import com.example.easytodo.services.ProjectAPI;
 import com.example.easytodo.services.TagAPI;
+import com.example.easytodo.services.TaskAPI;
 
 import java.util.List;
 
@@ -26,8 +30,8 @@ public class SyncHandler {
 
     public void fetch() {
         String lastSync = prefs.getString("last_sync", null);
-        if (lastSync == null) {
-            ChangeAPI changeAPI = GenAPIS.getChangeAPI();
+        ChangeAPI changeAPI = GenAPIS.getChangeAPI();
+        if(lastSync == null) {
             H.enqueueReq(changeAPI.getChanges(), (call, response) -> {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Change> changes = response.body();
@@ -36,7 +40,6 @@ public class SyncHandler {
                 }
             });
         } else {
-            ChangeAPI changeAPI = GenAPIS.getChangeAPI();
             H.enqueueReq(changeAPI.getChangesAfter(lastSync), (call, response) -> {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Change> changes = response.body();
@@ -62,6 +65,10 @@ public class SyncHandler {
     public void create(Change change) {
         if (change.getTable().equals(TableEnum.TAG.getValue())) {
             createTag(change.getData_id());
+        } else if (change.getTable().equals(TableEnum.PROJECT.getValue())) {
+            createProject(change.getData_id());
+        } else if (change.getTable().equals(TableEnum.TASK.getValue())) {
+            createTask(change.getData_id());
         }
     }
 
@@ -78,6 +85,28 @@ public class SyncHandler {
                 Tag tag = response.body();
                 tag.setId(tagId);
                 tag.save(false);
+            }
+        });
+    }
+
+    public void createProject(long projectId) {
+        ProjectAPI projectAPI = GenAPIS.getProjectAPI();
+        H.enqueueReq(projectAPI.getProject(projectId), (call, response) -> {
+            if (response.isSuccessful() && response.body() != null) {
+                Project project = response.body();
+                project.setId(projectId);
+                project.save(false);
+            }
+        });
+    }
+
+    public void createTask(long taskId) {
+        TaskAPI taskAPI = GenAPIS.getTaskAPI();
+        H.enqueueReq(taskAPI.getTask(taskId), (call, response) -> {
+            if (response.isSuccessful() && response.body() != null) {
+                Task task = response.body();
+                task.setId(taskId);
+                task.save(false);
             }
         });
     }

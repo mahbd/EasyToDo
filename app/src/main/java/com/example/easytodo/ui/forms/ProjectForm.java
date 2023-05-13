@@ -16,6 +16,7 @@ import com.example.easytodo.databinding.FragmentProjectFormBinding;
 import com.example.easytodo.models.Project;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Locale;
 
 
@@ -51,15 +52,15 @@ public class ProjectForm extends Fragment {
             String date = binding.etApDate.getText().toString();
             String time = binding.etApTime.getText().toString();
             if (!date.isEmpty() && !time.isEmpty()) {
-                deadline = date + "T" + time + ":00";
+                deadline = date + "T" + time + ":00+06:00";
             } else if (!date.isEmpty()) {
-                deadline = date + "T00:00:00";
+                deadline = date + "T00:00:00+06:00";
             } else if (!time.isEmpty()) {
-                deadline = "1970-01-01T" + time + ":00";
+                deadline = "1970-01-01T" + time + ":00+06:00";
             } else {
-                deadline = "1970-01-01T00:00:00";
+                deadline = "1970-01-01T00:00:00+06:00";
             }
-            LocalDateTime dateTime = LocalDateTime.parse(deadline);
+            OffsetDateTime dateTime = OffsetDateTime.parse(deadline);
 
             String title = binding.etApTitle.getText().toString();
             String description = binding.etApDescription.getText().toString();

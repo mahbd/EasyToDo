@@ -78,11 +78,11 @@ public class TasksAdapter extends ArrayAdapter<Task> {
             holder.alarmView.setVisibility(View.VISIBLE);
             holder.alarmView.setText(task.getReminder());
         }
-        if (task.getProject().isEmpty()) {
+        if (task.getProject_title().isEmpty()) {
             holder.projectView.setVisibility(View.GONE);
         } else {
             holder.projectView.setVisibility(View.VISIBLE);
-            holder.projectView.setText(task.getProject());
+            holder.projectView.setText(task.getProject_title());
         }
         if (task.getTagsString().isEmpty()) {
             holder.tagView.setVisibility(View.GONE);

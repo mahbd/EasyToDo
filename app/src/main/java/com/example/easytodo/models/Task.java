@@ -3,10 +3,8 @@ package com.example.easytodo.models;
 
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
-import com.example.easytodo.utils.H;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import io.realm.Realm;
@@ -24,41 +22,41 @@ public class Task extends RealmObject {
     private boolean completed;
     private int occurrence;
     private int priority;
-    private RealmList<String> tags;
+    private RealmList<String> tag_titles;
     private int reminder;
-    private String project;
+    private String project_title;
     private long user;
 
     public Task() {
     }
 
-    public Task(String title, String description, LocalDateTime deadline, int duration, boolean completed,
-                int occurrence, int priority, List<String> tags, int reminder, String project, long user) {
+    public Task(String title, String description, OffsetDateTime deadline, int duration, boolean completed,
+                int occurrence, int priority, List<String> tag_titles, int reminder, String project_title, long user) {
         this.title = title;
         this.description = description;
-        this.deadline = H.localToUTCISO8601(deadline);
+        this.deadline = deadline.toString();
         this.duration = duration;
         this.completed = completed;
         this.occurrence = occurrence;
         this.priority = priority;
-        this.tags = new RealmList<>();
-        this.tags.addAll(tags);
+        this.tag_titles = new RealmList<>();
+        this.tag_titles.addAll(tag_titles);
         this.reminder = reminder;
-        this.project = project;
+        this.project_title = project_title;
         this.user = user;
     }
 
-    public Task(String title, String description, LocalDateTime deadline) {
+    public Task(String title, String description, OffsetDateTime deadline) {
         this.title = title;
         this.description = description;
-        this.deadline = H.localToUTCISO8601(deadline);
+        this.deadline = deadline.toString();
         this.duration = 0;
         this.completed = false;
         this.occurrence = 0;
         this.priority = 0;
-        this.tags = new RealmList<>();
+        this.tag_titles = new RealmList<>();
         this.reminder = 0;
-        this.project = "";
+        this.project_title = "";
         this.user = 0;
     }
 
@@ -80,15 +78,15 @@ public class Task extends RealmObject {
         return description;
     }
 
-    public LocalDateTime getDeadline() {
+    public OffsetDateTime getDeadline() {
         if (deadline == null || deadline.isEmpty()) {
             return null;
         }
-        return H.utcToLocalDateTime(deadline);
+        return OffsetDateTime.parse(deadline);
     }
 
     public String getDeadlineStr() {
-        LocalDateTime deadline = getDeadline();
+        OffsetDateTime deadline = getDeadline();
 
         if (deadline == null || deadline.getYear() < 2000) {
             return "";
@@ -108,13 +106,13 @@ public class Task extends RealmObject {
         return priority;
     }
 
-    public List<String> getTags() {
-        return tags;
+    public List<String> getTag_titles() {
+        return tag_titles;
     }
 
     public String getTagsString() {
         StringBuilder tagsString = new StringBuilder();
-        for (String tag : tags) {
+        for (String tag : tag_titles) {
             tagsString.append(tag).append(", ");
         }
         if (tagsString.length() > 0)
@@ -126,11 +124,11 @@ public class Task extends RealmObject {
         return reminder;
     }
 
-    public String getProject() {
-        if (project == null) {
+    public String getProject_title() {
+        if (project_title == null) {
             return "";
         }
-        return project;
+        return project_title;
     }
 
     public long getUser() {
@@ -153,5 +151,9 @@ public class Task extends RealmObject {
 
     public void save() {
         save(true);
+    }
+
+    public void setId(long taskId) {
+        id = taskId;
     }
 }

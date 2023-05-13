@@ -34,6 +34,24 @@ public class GenAPIS {
         return auth.create(ChangeAPI.class);
     }
 
+    public static TaskAPI getTaskAPI() {
+        Retrofit auth = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(getHttpClient().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        return auth.create(TaskAPI.class);
+    }
+
+    public static ProjectAPI getProjectAPI() {
+        Retrofit auth = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(getHttpClient().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        return auth.create(ProjectAPI.class);
+    }
+
     public static TagAPI getTagAPI() {
         Retrofit auth = new Retrofit.Builder()
                 .baseUrl(BASE_URL)

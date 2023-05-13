@@ -5,6 +5,7 @@ import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.utils.H;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -20,10 +21,10 @@ public class Project extends RealmObject {
     public Project() {
     }
 
-    public Project(String title, String description, LocalDateTime deadline) {
+    public Project(String title, String description, OffsetDateTime deadline) {
         this.title = title;
         this.description = description;
-        this.deadline = H.localToUTCISO8601(deadline);
+        this.deadline = deadline.toString();
     }
 
     public void save(boolean change) {
@@ -62,15 +63,15 @@ public class Project extends RealmObject {
         return description;
     }
 
-    public LocalDateTime getDeadline() {
+    public OffsetDateTime getDeadline() {
         if (deadline == null || deadline.isEmpty()) {
             return null;
         }
-        return H.utcToLocalDateTime(deadline);
+        return OffsetDateTime.parse(deadline);
     }
 
     public String getDeadlineStr() {
-        LocalDateTime deadline = getDeadline();
+        OffsetDateTime deadline = getDeadline();
         if (deadline == null || deadline.getYear() < 2000) {
             return "";
         }

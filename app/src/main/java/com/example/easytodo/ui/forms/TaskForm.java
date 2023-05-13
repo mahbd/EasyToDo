@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.example.easytodo.databinding.FragmentTaskFormBinding;
 import com.example.easytodo.models.Task;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Locale;
 
 
@@ -51,15 +51,15 @@ public class TaskForm extends Fragment {
             String date = binding.etAtDate.getText().toString();
             String time = binding.etAtTime.getText().toString();
             if (!date.isEmpty() && !time.isEmpty()) {
-                deadline = date + "T" + time + ":00";
+                deadline = date + "T" + time + ":00+06:00";
             } else if (!date.isEmpty()) {
-                deadline = date + "T00:00:00";
+                deadline = date + "T00:00:00+06:00";
             } else if (!time.isEmpty()) {
-                deadline = "1970-01-01T" + time + ":00";
+                deadline = "1970-01-01T" + time + ":00+06:00";
             } else {
-                deadline = "1970-01-01T00:00:00";
+                deadline = "1970-01-01T00:00:00+06:00";
             }
-            LocalDateTime dateTime = LocalDateTime.parse(deadline);
+            OffsetDateTime dateTime = OffsetDateTime.parse(deadline);
 
             String title = binding.etAtTitle.getText().toString();
             String description = binding.etAtDescription.getText().toString();
