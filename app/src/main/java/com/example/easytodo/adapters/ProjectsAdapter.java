@@ -65,11 +65,11 @@ public class ProjectsAdapter extends ArrayAdapter<Project> {
             holder.descriptionView.setVisibility(View.VISIBLE);
             holder.descriptionView.setText(project.getDescription());
         }
-        if (project.getDeadline().isEmpty()) {
+        if (project.getDeadlineStr().isEmpty()) {
             holder.dateTimeView.setVisibility(View.GONE);
         } else {
             holder.dateTimeView.setVisibility(View.VISIBLE);
-            holder.dateTimeView.setText(project.getDeadline());
+            holder.dateTimeView.setText(project.getDeadlineStr());
         }
 
         return row;

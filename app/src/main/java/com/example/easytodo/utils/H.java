@@ -2,9 +2,13 @@ package com.example.easytodo.utils;
 
 import androidx.annotation.NonNull;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.zone.ZoneRules;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,9 +33,24 @@ public class H {
         });
     }
 
+    public static Duration currentUTCOffset() {
+        ZoneId zoneId = ZoneId.systemDefault();
+        ZoneRules rules = zoneId.getRules();
+        ZoneOffset offset = rules.getOffset(Instant.now());
+        return Duration.ofSeconds(offset.getTotalSeconds());
+    }
+
     public static String currentUTCISO8601() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneOffset.UTC);
         return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+    }
+
+    public static String localToUTCISO8601(LocalDateTime dateTime) {
+        return dateTime.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+    }
+
+    public static LocalDateTime utcToLocalDateTime(String utc) {
+        return LocalDateTime.parse(utc, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")).plus(currentUTCOffset());
     }
 
 }

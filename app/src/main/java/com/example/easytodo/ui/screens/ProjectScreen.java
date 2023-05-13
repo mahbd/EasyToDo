@@ -4,10 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.example.easytodo.R;
 import com.example.easytodo.adapters.ProjectsAdapter;
@@ -30,6 +30,8 @@ public class ProjectScreen extends Fragment {
         List<Project> projects = Realm.getDefaultInstance().where(Project.class).findAll();
         ProjectsAdapter adapter = new ProjectsAdapter(getContext(), R.id.project_list, projects);
         binding.projectList.setAdapter(adapter);
+
+        binding.btnNewProject.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_project_form));
 
         return root;
     }
