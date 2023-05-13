@@ -60,4 +60,13 @@ public class GenAPIS {
                 .build();
         return auth.create(TagAPI.class);
     }
+
+    public static ShareAPI getShareAPI() {
+        Retrofit auth = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(getHttpClient().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        return auth.create(ShareAPI.class);
+    }
 }

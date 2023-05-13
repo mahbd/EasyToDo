@@ -21,7 +21,7 @@ public class H {
     }
 
     public static <T> void enqueueReq(Call<T> call, EnqueueReq<T> onResponse) {
-        call.enqueue(new Callback<T>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<T> call, @NonNull Response<T> response) {
                 onResponse.onResponse(call, response);

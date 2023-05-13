@@ -141,7 +141,7 @@ public class Task extends RealmObject {
             id = maxId == null ? 1000_000_000 : maxId.longValue() + 1;
         }
 
-        Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealm(Task.this));
+        Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealmOrUpdate(Task.this));
 
         if (change) {
             Sync sync = new Sync(TableEnum.TASK, id, ActionEnum.CREATE);

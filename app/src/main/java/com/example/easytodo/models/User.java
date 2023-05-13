@@ -2,8 +2,10 @@ package com.example.easytodo.models;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class User extends RealmObject {
+    @PrimaryKey
     private long id;
     private String username;
     private String first_name;
