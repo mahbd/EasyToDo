@@ -12,4 +12,6 @@
     <string name="menu_slideshow">Slideshow</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dummy_mid">Hello dummy medium</string>
+    <string name="dummy_big">Hello dummy big. This is very big string. This may extend to multiple lines</string>
 </resources>

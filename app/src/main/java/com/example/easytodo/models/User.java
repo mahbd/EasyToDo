@@ -1,21 +1,30 @@
 package com.example.easytodo.models;
 
-public class User {
-    private final long id;
-    private final String username;
-    private final String email;
-    private final String first_name;
-    private final String last_name;
+import io.realm.Realm;
+import io.realm.RealmObject;
 
-    public User(long id, String username, String email, String first_name, String last_name) {
+public class User extends RealmObject {
+    private long id;
+    private String username;
+    private String first_name;
+    private String last_name;
+
+    public User() {
+
+    }
+
+    public User(long id, String username, String first_name, String last_name) {
         this.id = id;
         this.username = username;
-        this.email = email;
         this.first_name = first_name;
         this.last_name = last_name;
     }
 
     public long getId() {
         return id;
+    }
+
+    public void save() {
+        Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealm(User.this));
     }
 }
