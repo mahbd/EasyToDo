@@ -2,6 +2,10 @@ package com.example.easytodo.utils;
 
 import androidx.annotation.NonNull;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,6 +27,11 @@ public class H {
                 // TODO: Handle this
             }
         });
+    }
+
+    public static String currentUTCISO8601() {
+        LocalDateTime dateTime = LocalDateTime.now(ZoneOffset.UTC);
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
     }
 
 }

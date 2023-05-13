@@ -20,6 +20,9 @@ import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.UserAPI;
 import com.example.easytodo.utils.H;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Map;
 
 import retrofit2.Call;
@@ -41,13 +44,20 @@ public class LoginForm extends Fragment {
 
             UserAPI userAPI = GenAPIS.getUserAPI();
             Map<String, String> body = Map.of("username", username, "password", password);
-            Call<Token> tokenCall = userAPI.getToken(body);
+            Call<Map<String, String>> tokenCall = userAPI.getToken(body);
             H.enqueueReq(tokenCall, (call, response) -> {
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(getContext(), "Login Successful", Toast.LENGTH_LONG).show();
-                    Token token = response.body();
-                    prefs.edit().putString("access", token.getAccess()).apply();
-                    prefs.edit().putString("refresh", token.getRefresh()).apply();
+                    Map<String, String> token = response.body();
+                    try {
+                        prefs.edit().putString("access", token.get("access")).apply();
+                        prefs.edit().putString("refresh", token.get("refresh")).apply();
+                        Token.access = token.get("access");
+                        Token.refresh = token.get("refresh");
+                        requireActivity().onBackPressed();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     binding.etPassword.setError("Invalid Credentials");
                     Toast.makeText(getContext(), "Login Failed", Toast.LENGTH_LONG).show();
