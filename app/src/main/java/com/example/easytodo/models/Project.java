@@ -63,7 +63,7 @@ public class Project extends RealmObject {
     }
 
     public LocalDateTime getDeadline() {
-        if (deadline == null) {
+        if (deadline == null || deadline.isEmpty()) {
             return null;
         }
         return H.utcToLocalDateTime(deadline);

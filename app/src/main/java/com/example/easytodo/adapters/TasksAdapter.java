@@ -66,11 +66,11 @@ public class TasksAdapter extends ArrayAdapter<Task> {
             holder.descriptionView.setVisibility(View.VISIBLE);
             holder.descriptionView.setText(task.getDescription());
         }
-        if (task.getDeadline().isEmpty()) {
+        if (task.getDeadlineStr().isEmpty()) {
             holder.dateTimeView.setVisibility(View.GONE);
         } else {
             holder.dateTimeView.setVisibility(View.VISIBLE);
-            holder.dateTimeView.setText(task.getDeadline());
+            holder.dateTimeView.setText(task.getDeadlineStr());
         }
         if (task.getReminder() == 0) {
             holder.alarmView.setVisibility(View.GONE);

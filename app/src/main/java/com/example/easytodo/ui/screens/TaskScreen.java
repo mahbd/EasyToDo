@@ -7,14 +7,16 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.example.easytodo.R;
 import com.example.easytodo.adapters.TasksAdapter;
 import com.example.easytodo.databinding.FragmentTaskBinding;
 import com.example.easytodo.models.Task;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import io.realm.Realm;
 
 
 public class TaskScreen extends Fragment {
@@ -25,9 +27,11 @@ public class TaskScreen extends Fragment {
         binding = FragmentTaskBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        Task task1 = new Task("Task 1", "This is task 1", "", 0, false, 0, 1, new ArrayList<>(), 0, "", 0);
-        TasksAdapter adapter = new TasksAdapter(requireContext(), R.layout.task_item, List.of(task1));
+        List<Task> taskList = Realm.getDefaultInstance().where(Task.class).findAll();
+        TasksAdapter adapter = new TasksAdapter(requireContext(), R.layout.task_item, taskList);
         binding.taskList.setAdapter(adapter);
+
+        binding.addNewTask.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_task_form));
         return root;
     }
 

@@ -3,7 +3,10 @@ package com.example.easytodo.models;
 
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
+import com.example.easytodo.utils.H;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
@@ -29,10 +32,11 @@ public class Task extends RealmObject {
     public Task() {
     }
 
-    public Task(String title, String description, String deadline, int duration, boolean completed, int occurrence, int priority, List<String> tags, int reminder, String project, long user) {
+    public Task(String title, String description, LocalDateTime deadline, int duration, boolean completed,
+                int occurrence, int priority, List<String> tags, int reminder, String project, long user) {
         this.title = title;
         this.description = description;
-        this.deadline = deadline;
+        this.deadline = H.localToUTCISO8601(deadline);
         this.duration = duration;
         this.completed = completed;
         this.occurrence = occurrence;
@@ -44,20 +48,52 @@ public class Task extends RealmObject {
         this.user = user;
     }
 
+    public Task(String title, String description, LocalDateTime deadline) {
+        this.title = title;
+        this.description = description;
+        this.deadline = H.localToUTCISO8601(deadline);
+        this.duration = 0;
+        this.completed = false;
+        this.occurrence = 0;
+        this.priority = 0;
+        this.tags = new RealmList<>();
+        this.reminder = 0;
+        this.project = "";
+        this.user = 0;
+    }
+
     public long getId() {
         return id;
     }
 
     public String getTitle() {
+        if (title == null) {
+            return "";
+        }
         return title;
     }
 
     public String getDescription() {
+        if (description == null) {
+            return "";
+        }
         return description;
     }
 
-    public String getDeadline() {
-        return deadline;
+    public LocalDateTime getDeadline() {
+        if (deadline == null || deadline.isEmpty()) {
+            return null;
+        }
+        return H.utcToLocalDateTime(deadline);
+    }
+
+    public String getDeadlineStr() {
+        LocalDateTime deadline = getDeadline();
+
+        if (deadline == null || deadline.getYear() < 2000) {
+            return "";
+        }
+        return deadline.toString();
     }
 
     public boolean isCompleted() {
@@ -91,6 +127,9 @@ public class Task extends RealmObject {
     }
 
     public String getProject() {
+        if (project == null) {
+            return "";
+        }
         return project;
     }
 
