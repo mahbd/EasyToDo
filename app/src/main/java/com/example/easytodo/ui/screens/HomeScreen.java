@@ -42,7 +42,7 @@ public class HomeScreen extends Fragment {
 
         binding.button.setOnClickListener(v -> {
             SyncHandler syncHandler = new SyncHandler(requireContext());
-            syncHandler.fetch();
+            syncHandler.sync();
         });
 
         return root;

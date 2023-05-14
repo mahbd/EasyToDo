@@ -5,7 +5,9 @@ import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -106,6 +108,10 @@ public class Task extends RealmObject {
         return priority;
     }
 
+    public int getDuration() {
+        return duration;
+    }
+
     public List<String> getTag_titles() {
         return tag_titles;
     }
@@ -153,7 +159,45 @@ public class Task extends RealmObject {
         save(true);
     }
 
-    public void setId(long taskId) {
-        id = taskId;
+    public static void delete(long id, boolean change) {
+        Realm.getDefaultInstance().executeTransaction(realm -> {
+            Task task = realm.where(Task.class).equalTo("id", id).findFirst();
+            if (task != null) {
+                task.deleteFromRealm();
+                if (change) {
+                    Sync sync = new Sync(TableEnum.TASK, id, ActionEnum.DELETE);
+                    sync.save();
+                }
+            }
+        });
+    }
+
+    public static void delete(long id) {
+        delete(id, true);
+    }
+
+    public static Map<String, Object> getMap(Task task) {
+        Map<String, Object> taskMap = new HashMap<>();
+        if (task.getTitle() != null && !task.getTitle().isEmpty())
+            taskMap.put("title", task.getTitle());
+        if (task.getDescription() != null && !task.getDescription().isEmpty())
+            taskMap.put("description", task.getDescription());
+        if (task.getDeadline() != null && !(task.getDeadline().getYear() < 2000))
+            taskMap.put("deadline", task.getDeadlineStr());
+        if (task.getDuration() > 0)
+            taskMap.put("duration", task.getDuration());
+        taskMap.put("completed", task.isCompleted());
+        if (task.getOccurrence() > 0)
+            taskMap.put("occurrence", task.getOccurrence());
+        if (task.getPriority() > 0)
+            taskMap.put("priority", task.getPriority());
+        if (task.getTag_titles() != null && !task.getTag_titles().isEmpty())
+            taskMap.put("tags", task.getTagsString());
+        if (task.getReminder() > 0)
+            taskMap.put("reminder", task.getReminder());
+        if (task.getProject_title() != null && !task.getProject_title().isEmpty())
+            taskMap.put("project", task.getProject_title());
+
+        return taskMap;
     }
 }

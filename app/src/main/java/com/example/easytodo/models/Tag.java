@@ -4,6 +4,9 @@ package com.example.easytodo.models;
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -18,6 +21,10 @@ public class Tag extends RealmObject {
     }
 
     public Tag() {
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -44,11 +51,28 @@ public class Tag extends RealmObject {
         save(true);
     }
 
+    public static void delete(long id, boolean change) {
+        Realm.getDefaultInstance().executeTransaction(realm -> {
+            Tag tag = realm.where(Tag.class).equalTo("id", id).findFirst();
+            if (tag != null) {
+                tag.deleteFromRealm();
+                if (change) {
+                    Sync sync = new Sync(TableEnum.TAG, id, ActionEnum.DELETE);
+                    sync.save();
+                }
+            }
+        });
+    }
+
     public static boolean exists(String title) {
         return Realm.getDefaultInstance().where(Tag.class).equalTo("title", title).count() > 0;
     }
 
-    public void setId(long tagId) {
-        this.id = tagId;
+    public static Map<String, Object> getMap(Tag tag) {
+        Map<String, Object> map = new HashMap<>();
+        if (tag.getTitle() != null && !tag.getTitle().isEmpty()) {
+            map.put("title", tag.getTitle());
+        }
+        return map;
     }
 }

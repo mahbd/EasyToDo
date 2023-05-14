@@ -9,6 +9,7 @@ import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.models.Change;
 import com.example.easytodo.models.Project;
+import com.example.easytodo.models.Sync;
 import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.Task;
 import com.example.easytodo.services.ChangeAPI;
@@ -16,8 +17,14 @@ import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.ProjectAPI;
 import com.example.easytodo.services.TagAPI;
 import com.example.easytodo.services.TaskAPI;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import io.realm.Realm;
 
 public class SyncHandler {
     Context context;
@@ -28,10 +35,15 @@ public class SyncHandler {
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    public void sync() {
+        fetch();
+        push();
+    }
+
     public void fetch() {
         String lastSync = prefs.getString("last_sync", null);
         ChangeAPI changeAPI = GenAPIS.getChangeAPI();
-        if(lastSync == null) {
+        if (lastSync == null) {
             H.enqueueReq(changeAPI.getChanges(), (call, response) -> {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Change> changes = response.body();
@@ -47,6 +59,19 @@ public class SyncHandler {
                     prefs.edit().putString("last_sync", H.currentUTCISO8601()).apply();
                 }
             });
+        }
+    }
+
+    public void push() {
+        List<Sync> syncs = Realm.getDefaultInstance().where(Sync.class).findAll();
+        for (Sync sync : syncs) {
+            if (Objects.equals(sync.getTable(), TableEnum.TASK.getValue())) {
+                pushTask(sync);
+            } else if (Objects.equals(sync.getTable(), TableEnum.PROJECT.getValue())) {
+                pushProject(sync);
+            } else if (Objects.equals(sync.getTable(), TableEnum.TAG.getValue())) {
+                pushTag(sync);
+            }
         }
     }
 
@@ -83,7 +108,6 @@ public class SyncHandler {
         H.enqueueReq(tagAPI.getTag(tagId), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {
                 Tag tag = response.body();
-                tag.setId(tagId);
                 tag.save(false);
             }
         });
@@ -94,7 +118,6 @@ public class SyncHandler {
         H.enqueueReq(projectAPI.getProject(projectId), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {
                 Project project = response.body();
-                project.setId(projectId);
                 project.save(false);
             }
         });
@@ -105,9 +128,90 @@ public class SyncHandler {
         H.enqueueReq(taskAPI.getTask(taskId), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {
                 Task task = response.body();
-                task.setId(taskId);
                 task.save(false);
             }
         });
+    }
+
+    public static void pushTask(Sync sync) {
+        TaskAPI taskAPI = GenAPIS.getTaskAPI();
+        Task task = Realm.getDefaultInstance().where(Task.class).equalTo("id", sync.getDataId()).findFirst();
+        if (task != null) {
+            if (task.getId() >= 1000_000_000) {
+                Map<String, Object> taskMap = Task.getMap(task);
+                H.enqueueReq(taskAPI.createTask(taskMap), (call, response) -> {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Task newTask = response.body();
+                        Task.delete(task.getId(), false);
+                        newTask.save(false);
+                        Sync.delete(sync.getId());
+                    } else {
+                        if (response.code() == 400) {
+                            try {
+                                JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
+                                System.out.println(error);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    public static void pushProject(Sync sync) {
+        ProjectAPI projectAPI = GenAPIS.getProjectAPI();
+        Project project = Realm.getDefaultInstance().where(Project.class).equalTo("id", sync.getDataId()).findFirst();
+        if (project != null) {
+            if (project.getId() >= 1000_000_000) {
+                Map<String, Object> projectMap = Project.getMap(project);
+                H.enqueueReq(projectAPI.createProject(projectMap), (call, response) -> {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Project newProject = response.body();
+                        Project.delete(project.getId(), false);
+                        newProject.save(false);
+                        Sync.delete(sync.getId());
+                    } else {
+                        if (response.code() == 400) {
+                            try {
+                                JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
+                                System.out.println(error);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    public static void pushTag(Sync sync) {
+        TagAPI tagAPI = GenAPIS.getTagAPI();
+        Tag tag = Realm.getDefaultInstance().where(Tag.class).equalTo("id", sync.getDataId()).findFirst();
+        if (tag != null) {
+            if (tag.getId() >= 1000_000_000) {
+                Map<String, Object> tagMap = Tag.getMap(tag);
+                H.enqueueReq(tagAPI.createTag(tagMap), (call, response) -> {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Tag newTag = response.body();
+                        Tag.delete(tag.getId(), false);
+                        newTag.save(false);
+                        Sync.delete(sync.getId());
+                    } else {
+                        if (response.code() == 400) {
+                            Sync.delete(sync.getId());
+                            try {
+                                JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
+                                System.out.println(error);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }
     }
 }

@@ -39,4 +39,20 @@ public class Sync extends RealmObject {
             }
         });
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getTable() {
+        return table;
+    }
+
+    public long getDataId() {
+        return dataId;
+    }
+
+    public String getAction() {
+        return action;
+    }
 }
