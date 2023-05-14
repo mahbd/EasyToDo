@@ -8,7 +8,9 @@ import android.widget.SimpleAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
+import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentShareBinding;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.models.Share;
@@ -87,6 +89,8 @@ public class ShareScreen extends Fragment {
                 binding.tagsSharedWithMe.setAdapter(adapter);
             }
         });
+
+        binding.shareMore.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_share_form));
 
         return root;
     }

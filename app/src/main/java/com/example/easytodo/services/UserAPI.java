@@ -4,10 +4,12 @@ import com.example.easytodo.models.User;
 
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface UserAPI {
@@ -19,4 +21,7 @@ public interface UserAPI {
 
     @POST("auth/users/")
     Call<User> registerUser(@Body Map<String, String> body);
+
+    @GET("users/")
+    Call<List<User>> getUsers();
 }

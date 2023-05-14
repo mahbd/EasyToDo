@@ -26,6 +26,10 @@ public class User extends RealmObject {
         return id;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public void save() {
         Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealm(User.this));
     }
