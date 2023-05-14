@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -35,9 +36,27 @@ public class TagScreen extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, tagNames);
         binding.tagList.setAdapter(adapter);
 
-        binding.btnNewTag.setOnClickListener(v -> {
-            Navigation.findNavController(requireActivity(), com.example.easytodo.R.id.nav_host_fragment_content_main)
-                    .navigate(R.id.nav_tag_form);
+        binding.btnNewTag.setOnClickListener(v -> Navigation.findNavController(requireActivity(),
+                R.id.fragment_container).navigate(R.id.nav_tag_form));
+
+        binding.tagList.setOnItemLongClickListener((parent, view, position, id) -> {
+            PopupMenu popupMenu = new PopupMenu(requireContext(), view);
+            popupMenu.getMenuInflater().inflate(R.menu.delete_edit_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.item_edit) {
+                    Tag tag = tags.get(position);
+                    Bundle bundle = new Bundle();
+                    if (tag != null)
+                        bundle.putLong("tag", tag.getId());
+                    Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                            .navigate(R.id.nav_tag_form, bundle);
+                } else if (item.getItemId() == R.id.item_delete) {
+                    System.out.println("Delete clicked");
+                }
+                return true;
+            });
+            popupMenu.show();
+            return false;
         });
 
         return root;

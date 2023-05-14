@@ -31,6 +31,13 @@ public class Tag extends RealmObject {
         return title;
     }
 
+    public void setTitle(String title) {
+        if (this.title.equals(title)) return;
+        Realm.getDefaultInstance().beginTransaction();
+        this.title = title;
+        Realm.getDefaultInstance().commitTransaction();
+    }
+
     public void save(boolean change) {
         if (exists(title)) {
             return;
@@ -40,7 +47,7 @@ public class Tag extends RealmObject {
             id = maxId == null ? 1000_000_000 : maxId.longValue() + 1;
         }
 
-        Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealm(Tag.this));
+        Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealmOrUpdate(Tag.this));
         if (change) {
             Sync sync = new Sync(TableEnum.TAG, id, ActionEnum.CREATE);
             sync.save();

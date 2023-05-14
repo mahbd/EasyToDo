@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import io.realm.Realm;
+import retrofit2.Call;
 
 public class SyncHandler {
     Context context;
@@ -77,33 +78,28 @@ public class SyncHandler {
 
     public void applyChanges(List<Change> changes) {
         for (Change change : changes) {
-            if (change.getAction().equals(ActionEnum.CREATE.getValue())) {
-                create(change);
-            } else if (change.getAction().equals(ActionEnum.UPDATE.getValue())) {
-                update(change);
+            if (change.getAction().equals(ActionEnum.CREATE.getValue()) || change.getAction().equals(ActionEnum.UPDATE.getValue())) {
+                createOrUpdate(change);
             } else if (change.getAction().equals(ActionEnum.DELETE.getValue())) {
                 delete(change);
             }
         }
     }
 
-    public void create(Change change) {
+    public void createOrUpdate(Change change) {
         if (change.getTable().equals(TableEnum.TAG.getValue())) {
-            createTag(change.getData_id());
+            createOrUpdateTag(change.getData_id());
         } else if (change.getTable().equals(TableEnum.PROJECT.getValue())) {
-            createProject(change.getData_id());
+            createOrUpdateProject(change.getData_id());
         } else if (change.getTable().equals(TableEnum.TASK.getValue())) {
             createTask(change.getData_id());
         }
     }
 
-    public void update(Change change) {
-    }
-
     public void delete(Change change) {
     }
 
-    public void createTag(long tagId) {
+    public void createOrUpdateTag(long tagId) {
         TagAPI tagAPI = GenAPIS.getTagAPI();
         H.enqueueReq(tagAPI.getTag(tagId), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {
@@ -113,7 +109,7 @@ public class SyncHandler {
         });
     }
 
-    public void createProject(long projectId) {
+    public void createOrUpdateProject(long projectId) {
         ProjectAPI projectAPI = GenAPIS.getProjectAPI();
         H.enqueueReq(projectAPI.getProject(projectId), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {
@@ -146,7 +142,7 @@ public class SyncHandler {
                         newTask.save(false);
                         Sync.delete(sync.getId());
                     } else {
-                        if (response.code() == 400) {
+                        if (response.code() == 400 && response.errorBody() != null) {
                             try {
                                 JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
                                 System.out.println(error);
@@ -173,7 +169,7 @@ public class SyncHandler {
                         newProject.save(false);
                         Sync.delete(sync.getId());
                     } else {
-                        if (response.code() == 400) {
+                        if (response.code() == 400 && response.errorBody() != null) {
                             try {
                                 JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
                                 System.out.println(error);
@@ -191,27 +187,31 @@ public class SyncHandler {
         TagAPI tagAPI = GenAPIS.getTagAPI();
         Tag tag = Realm.getDefaultInstance().where(Tag.class).equalTo("id", sync.getDataId()).findFirst();
         if (tag != null) {
+            Map<String, Object> tagMap = Tag.getMap(tag);
+            Call<Tag> tagCall;
             if (tag.getId() >= 1000_000_000) {
-                Map<String, Object> tagMap = Tag.getMap(tag);
-                H.enqueueReq(tagAPI.createTag(tagMap), (call, response) -> {
-                    if (response.isSuccessful() && response.body() != null) {
-                        Tag newTag = response.body();
-                        Tag.delete(tag.getId(), false);
-                        newTag.save(false);
+                tagCall = tagAPI.createTag(tagMap);
+            } else {
+                tagCall = tagAPI.updateTag(tag.getId(), tagMap);
+            }
+            H.enqueueReq(tagCall, (call, response) -> {
+                if (response.isSuccessful() && response.body() != null) {
+                    Tag newTag = response.body();
+                    Tag.delete(tag.getId(), false);
+                    newTag.save(false);
+                    Sync.delete(sync.getId());
+                } else {
+                    if (response.code() == 400 && response.errorBody() != null) {
                         Sync.delete(sync.getId());
-                    } else {
-                        if (response.code() == 400) {
-                            Sync.delete(sync.getId());
-                            try {
-                                JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
-                                System.out.println(error);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                        try {
+                            JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
+                            System.out.println(error);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
-                });
-            }
+                }
+            });
         }
     }
 }

@@ -2,8 +2,14 @@ package com.example.easytodo;
 
 import android.app.Application;
 
+import com.example.easytodo.enums.ActionEnum;
+import com.example.easytodo.enums.TableEnum;
+import com.example.easytodo.models.Sync;
+import com.example.easytodo.utils.Events;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 
 public class MainApplication extends Application {
     @Override
@@ -19,5 +25,20 @@ public class MainApplication extends Application {
                 .deleteRealmIfMigrationNeeded()
                 .build();
         Realm.setDefaultConfiguration(config);
+
+        Realm realm = Realm.getDefaultInstance();
+
+        Events.setTagListener((tagId, action) -> {
+            if (action == ActionEnum.UPDATE) {
+                RealmResults<Sync> syncs = realm.where(Sync.class)
+                        .equalTo("table", TableEnum.TAG.getValue())
+                        .equalTo("dataId", tagId).findAll();
+                if (syncs != null && syncs.size() > 0) {
+                    realm.executeTransaction(realm1 -> syncs.deleteAllFromRealm());
+                }
+                Sync sync = new Sync(TableEnum.TAG, tagId, ActionEnum.UPDATE);
+                sync.save();
+            }
+        });
     }
 }

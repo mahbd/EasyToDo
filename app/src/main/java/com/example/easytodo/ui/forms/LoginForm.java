@@ -20,9 +20,6 @@ import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.UserAPI;
 import com.example.easytodo.utils.H;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Map;
 
 import retrofit2.Call;
@@ -66,7 +63,7 @@ public class LoginForm extends Fragment {
         });
 
         binding.btnRegister.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_container);
             navController.navigate(R.id.nav_register_form);
         });
 

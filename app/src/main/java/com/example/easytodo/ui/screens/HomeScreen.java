@@ -14,15 +14,7 @@ import androidx.preference.PreferenceManager;
 
 import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentHomeBinding;
-import com.example.easytodo.models.Change;
-import com.example.easytodo.services.ChangeAPI;
-import com.example.easytodo.services.GenAPIS;
-import com.example.easytodo.utils.H;
 import com.example.easytodo.utils.SyncHandler;
-
-import java.util.List;
-
-import retrofit2.Call;
 
 
 public class HomeScreen extends Fragment {
@@ -35,7 +27,7 @@ public class HomeScreen extends Fragment {
         View root = binding.getRoot();
 
         binding.btnLogin.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_container);
             navController.navigate(R.id.nav_login_form);
 
         });

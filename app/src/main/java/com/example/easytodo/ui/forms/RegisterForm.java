@@ -57,7 +57,7 @@ public class RegisterForm extends Fragment {
                     formHandler.clearFields();
                     binding.etRegPassword2.setText("");
                     Toast.makeText(getContext(), "Registration Successful", Toast.LENGTH_LONG).show();
-                    NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+                    NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_container);
                     navController.navigate(R.id.nav_login_form);
                 } else {
                     formHandler.set400Error(response);
@@ -66,7 +66,7 @@ public class RegisterForm extends Fragment {
         });
 
         binding.btnRegLogin.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_container);
             navController.navigate(R.id.nav_login_form);
         });
 

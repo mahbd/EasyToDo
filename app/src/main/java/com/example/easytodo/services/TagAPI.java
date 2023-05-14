@@ -10,6 +10,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 
@@ -24,4 +25,7 @@ public interface TagAPI {
 
     @POST("tags/")
     Call<Tag> createTag(@Body Map<String, Object> body);
+
+    @PUT("tags/{id}/")
+    Call<Tag> updateTag(@Path("id") long id, @Body Map<String, Object> body);
 }
