@@ -13,6 +13,7 @@ import androidx.navigation.Navigation;
 
 import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentTagBinding;
+import com.example.easytodo.models.Sync;
 import com.example.easytodo.models.Tag;
 
 import io.realm.Realm;
@@ -51,7 +52,10 @@ public class TagScreen extends Fragment {
                     Navigation.findNavController(requireActivity(), R.id.fragment_container)
                             .navigate(R.id.nav_tag_form, bundle);
                 } else if (item.getItemId() == R.id.item_delete) {
-                    System.out.println("Delete clicked");
+                    Tag tag = tags.get(position);
+                    if (tag != null) {
+                        Tag.delete(tag.getId());
+                    }
                 }
                 return true;
             });

@@ -6,6 +6,7 @@ import com.example.easytodo.enums.TableEnum;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -59,16 +60,23 @@ public class Tag extends RealmObject {
     }
 
     public static void delete(long id, boolean change) {
+        AtomicBoolean deleted = new AtomicBoolean(false);
         Realm.getDefaultInstance().executeTransaction(realm -> {
             Tag tag = realm.where(Tag.class).equalTo("id", id).findFirst();
             if (tag != null) {
                 tag.deleteFromRealm();
-                if (change) {
-                    Sync sync = new Sync(TableEnum.TAG, id, ActionEnum.DELETE);
-                    sync.save();
-                }
+                deleted.set(true);
             }
         });
+
+        if (change && deleted.get()) {
+            Sync sync = new Sync(TableEnum.TAG, id, ActionEnum.DELETE);
+            sync.save();
+        }
+    }
+
+    public static void delete(long id) {
+        delete(id, true);
     }
 
     public static boolean exists(String title) {

@@ -2,12 +2,11 @@ package com.example.easytodo.models;
 
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
-import com.example.easytodo.utils.H;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -81,16 +80,19 @@ public class Project extends RealmObject {
     }
 
     public static void delete(long id, boolean change) {
+        AtomicBoolean deleted = new AtomicBoolean(false);
         Realm.getDefaultInstance().executeTransaction(realm -> {
             Project project = realm.where(Project.class).equalTo("id", id).findFirst();
             if (project != null) {
                 project.deleteFromRealm();
-                if (change) {
-                    Sync sync = new Sync(TableEnum.PROJECT, id, ActionEnum.DELETE);
-                    sync.save();
-                }
+                deleted.set(true);
             }
         });
+
+        if (change && deleted.get()) {
+            Sync sync = new Sync(TableEnum.PROJECT, id, ActionEnum.DELETE);
+            sync.save();
+        }
     }
 
     public static void delete(long id) {

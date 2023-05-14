@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -160,16 +161,19 @@ public class Task extends RealmObject {
     }
 
     public static void delete(long id, boolean change) {
+        AtomicBoolean deleted = new AtomicBoolean(false);
         Realm.getDefaultInstance().executeTransaction(realm -> {
             Task task = realm.where(Task.class).equalTo("id", id).findFirst();
             if (task != null) {
                 task.deleteFromRealm();
-                if (change) {
-                    Sync sync = new Sync(TableEnum.TASK, id, ActionEnum.DELETE);
-                    sync.save();
-                }
+                deleted.set(true);
             }
         });
+
+        if (change && deleted.get()) {
+            Sync sync = new Sync(TableEnum.TASK, id, ActionEnum.DELETE);
+            sync.save();
+        }
     }
 
     public static void delete(long id) {

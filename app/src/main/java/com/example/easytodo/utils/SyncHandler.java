@@ -133,26 +133,30 @@ public class SyncHandler {
         TaskAPI taskAPI = GenAPIS.getTaskAPI();
         Task task = Realm.getDefaultInstance().where(Task.class).equalTo("id", sync.getDataId()).findFirst();
         if (task != null) {
-            if (task.getId() >= 1000_000_000) {
-                Map<String, Object> taskMap = Task.getMap(task);
-                H.enqueueReq(taskAPI.createTask(taskMap), (call, response) -> {
-                    if (response.isSuccessful() && response.body() != null) {
-                        Task newTask = response.body();
-                        Task.delete(task.getId(), false);
-                        newTask.save(false);
-                        Sync.delete(sync.getId());
-                    } else {
-                        if (response.code() == 400 && response.errorBody() != null) {
-                            try {
-                                JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
-                                System.out.println(error);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+            Map<String, Object> taskMap = Task.getMap(task);
+            Call<Task> taskCall;
+            if (task.getId() < 2000_000_000) {
+                taskCall = taskAPI.createTask(taskMap);
+            } else {
+                taskCall = taskAPI.updateTask(task.getId(), taskMap);
+            }
+            H.enqueueReq(taskCall, (call, response) -> {
+                if (response.isSuccessful() && response.body() != null) {
+                    Task newTask = response.body();
+                    Task.delete(task.getId(), false);
+                    newTask.save(false);
+                    Sync.delete(sync.getId());
+                } else {
+                    if (response.code() == 400 && response.errorBody() != null) {
+                        try {
+                            JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
+                            System.out.println(error);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
-                });
-            }
+                }
+            });
         }
     }
 
@@ -160,26 +164,30 @@ public class SyncHandler {
         ProjectAPI projectAPI = GenAPIS.getProjectAPI();
         Project project = Realm.getDefaultInstance().where(Project.class).equalTo("id", sync.getDataId()).findFirst();
         if (project != null) {
+            Map<String, Object> projectMap = Project.getMap(project);
+            Call<Project> projectCall;
             if (project.getId() >= 1000_000_000) {
-                Map<String, Object> projectMap = Project.getMap(project);
-                H.enqueueReq(projectAPI.createProject(projectMap), (call, response) -> {
-                    if (response.isSuccessful() && response.body() != null) {
-                        Project newProject = response.body();
-                        Project.delete(project.getId(), false);
-                        newProject.save(false);
-                        Sync.delete(sync.getId());
-                    } else {
-                        if (response.code() == 400 && response.errorBody() != null) {
-                            try {
-                                JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
-                                System.out.println(error);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                projectCall = projectAPI.createProject(projectMap);
+            } else {
+                projectCall = projectAPI.updateProject(project.getId(), projectMap);
+            }
+            H.enqueueReq(projectCall, (call, response) -> {
+                if (response.isSuccessful() && response.body() != null) {
+                    Project newProject = response.body();
+                    Project.delete(project.getId(), false);
+                    newProject.save(false);
+                    Sync.delete(sync.getId());
+                } else {
+                    if (response.code() == 400 && response.errorBody() != null) {
+                        try {
+                            JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
+                            System.out.println(error);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
-                });
-            }
+                }
+            });
         }
     }
 
@@ -212,6 +220,8 @@ public class SyncHandler {
                     }
                 }
             });
+        } else {
+            H.enqueueReq(tagAPI.deleteTag(sync.getDataId()), (call, response) -> Sync.delete(sync.getId()));
         }
     }
 }
