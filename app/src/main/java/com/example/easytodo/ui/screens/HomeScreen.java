@@ -1,5 +1,6 @@
 package com.example.easytodo.ui.screens;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.preference.PreferenceManager;
 
 import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentHomeBinding;
@@ -21,8 +23,10 @@ public class HomeScreen extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        binding.btnLogin.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_login_form));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        if (prefs.getString("access", null) == null) {
+            Navigation.findNavController(root).navigate(R.id.nav_login_form);
+        }
 
         binding.button.setOnClickListener(v -> {
             SyncHandler syncHandler = new SyncHandler(requireContext());

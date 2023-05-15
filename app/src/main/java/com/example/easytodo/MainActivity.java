@@ -3,20 +3,19 @@ package com.example.easytodo;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 
-import com.example.easytodo.models.Token;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
-
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.example.easytodo.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,9 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        Token.access = prefs.getString("access", "");
-        Token.refresh = prefs.getString("refresh", "");
 
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.fab.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_tag_form));
@@ -57,5 +53,17 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.fragment_container);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_logout) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            prefs.edit().remove("access").apply();
+            prefs.edit().remove("refresh").apply();
+            Snackbar.make(binding.getRoot(), "Logged out", Snackbar.LENGTH_SHORT).show();
+            Navigation.findNavController(this, R.id.fragment_container).navigate(R.id.nav_login_form);
+        }
+        return true;
     }
 }

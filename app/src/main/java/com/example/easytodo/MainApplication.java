@@ -1,10 +1,14 @@
 package com.example.easytodo;
 
 import android.app.Application;
+import android.content.SharedPreferences;
+
+import androidx.preference.PreferenceManager;
 
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.models.Sync;
+import com.example.easytodo.models.Token;
 import com.example.easytodo.utils.Events;
 
 import io.realm.Realm;
@@ -66,5 +70,9 @@ public class MainApplication extends Application {
                 sync.save();
             }
         });
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Token.access = prefs.getString("access", "");
+        Token.refresh = prefs.getString("refresh", "");
     }
 }
