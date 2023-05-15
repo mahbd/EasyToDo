@@ -15,7 +15,7 @@ import androidx.preference.PreferenceManager;
 
 import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentLoginFormBinding;
-import com.example.easytodo.models.Token;
+import com.example.easytodo.services.Token;
 import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.UserAPI;
 import com.example.easytodo.utils.H;

@@ -8,7 +8,7 @@ import androidx.preference.PreferenceManager;
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.models.Sync;
-import com.example.easytodo.models.Token;
+import com.example.easytodo.services.Token;
 import com.example.easytodo.utils.Events;
 import com.example.easytodo.utils.SyncHandler;
 

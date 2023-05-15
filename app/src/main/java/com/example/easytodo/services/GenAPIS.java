@@ -1,15 +1,14 @@
 package com.example.easytodo.services;
 
-import com.example.easytodo.models.Token;
+import com.example.easytodo.utils.H;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-
 public class GenAPIS {
-    public static final String BASE_URL = "http://10.0.2.2:8000/api/";
+    public static final String BASE_URL = H.BASE_URL;
     static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -17,7 +16,8 @@ public class GenAPIS {
 
     public static OkHttpClient.Builder getHttpClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(new AuthInterceptor(Token.access));
+        httpClient.authenticator(new TokenAuthenticator())
+                .addInterceptor(new AuthInterceptor(Token.access));
         return httpClient;
     }
 

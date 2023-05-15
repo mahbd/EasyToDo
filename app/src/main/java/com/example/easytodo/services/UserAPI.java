@@ -17,7 +17,10 @@ public interface UserAPI {
     Call<Map<String, String>> getToken(@Body Map<String, String> body);
 
     @POST("auth/jwt/refresh/")
-    Call<JSONObject> refreshToken(@Body Map<String, String> body);
+    Call<Map<String, String>> refreshToken(@Body Map<String, String> body);
+
+    @POST("auth/jwt/verify/")
+    Call<Map<String, String>> verifyToken(@Body Map<String, String> body);
 
     @POST("auth/users/")
     Call<User> registerUser(@Body Map<String, String> body);

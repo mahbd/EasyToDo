@@ -16,8 +16,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class H {
+    public static final String BASE_URL = "http://10.0.2.2:8000/api/";
+    public static final String WS_URL = "ws://10.0.2.2:8000/ws/core/";
     public interface SimpleAlertCallback {
-        public void onOk();
+        void onOk();
     }
 
     public interface EnqueueReq<T> {
@@ -47,13 +49,11 @@ public class H {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(message);
-        builder.setPositiveButton("Ok", (dialog, which) -> {
-            callback.onOk();
-        });
+        builder.setPositiveButton("Ok", (dialog, which) -> callback.onOk());
         builder.show();
     }
 
-    public static void runDelay(Function func, int delay) {
+    public static void runDelay(Function<Void, Boolean> func, int delay) {
         Handler handler = new Handler();
         Runnable runnable = () -> func.apply(null);
         handler.postDelayed(runnable, delay);

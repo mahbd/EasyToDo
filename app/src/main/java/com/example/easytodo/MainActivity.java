@@ -24,9 +24,15 @@ import com.example.easytodo.models.Sync;
 import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.Task;
 import com.example.easytodo.models.User;
+import com.example.easytodo.services.GenAPIS;
+import com.example.easytodo.services.Token;
+import com.example.easytodo.services.UserAPI;
+import com.example.easytodo.utils.H;
 import com.example.easytodo.utils.SyncHandler;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +46,16 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        UserAPI userAPI = GenAPIS.getUserAPI();
+        Map<String, String> body = Map.of("access", Token.refresh);
+        H.enqueueReq(userAPI.verifyToken(body), (call, response) -> {
+            if (!response.isSuccessful()) {
+                Token.refreshToken(this);
+            } else {
+                System.out.println("Token is valid");
+            }
+        });
 
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.fab.setOnClickListener(v -> Navigation.findNavController(this,
