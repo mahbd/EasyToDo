@@ -13,10 +13,16 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.easytodo.databinding.FragmentTaskFormBinding;
+import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.models.Task;
+import com.example.easytodo.utils.Events;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+import io.realm.Realm;
 
 
 public class TaskForm extends Fragment {
@@ -26,6 +32,24 @@ public class TaskForm extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTaskFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        long taskId;
+        Task task = null;
+        if (getArguments() != null) {
+            taskId = getArguments().getLong("task");
+            task = Realm.getDefaultInstance().where(Task.class).equalTo("id", taskId).findFirst();
+            if (task != null) {
+                binding.etAtTitle.setText(task.getTitle());
+                binding.etAtDescription.setText(task.getDescription());
+                OffsetDateTime deadline = task.getDeadline();
+                if (deadline != null) {
+                    LocalDateTime localDateTime = deadline.toLocalDateTime();
+                    binding.etAtDate.setText(localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                    binding.etAtTime.setText(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+                }
+                binding.btnAtSave.setText("Update Task");
+            }
+        }
 
         binding.etAtDate.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext());
@@ -46,6 +70,7 @@ public class TaskForm extends Fragment {
             timePickerDialog.show();
         });
 
+        Task finalTask = task;
         binding.btnAtSave.setOnClickListener(v -> {
             String deadline;
             String date = binding.etAtDate.getText().toString();
@@ -70,8 +95,17 @@ public class TaskForm extends Fragment {
             }
             binding.etAtTitle.setError(null);
 
-            Task task = new Task(title, description, dateTime);
-            task.save();
+            if (finalTask != null) {
+                Realm.getDefaultInstance().executeTransaction(realm -> {
+                    finalTask.setTitle(title);
+                    finalTask.setDescription(description);
+                    finalTask.setDeadline(dateTime);
+                });
+                Events.notifyTaskListeners(finalTask.getId(), ActionEnum.UPDATE);
+            } else {
+                Task newTask = new Task(title, description, dateTime);
+                newTask.save();
+            }
             requireActivity().onBackPressed();
         });
 

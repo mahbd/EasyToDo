@@ -142,7 +142,7 @@ public class SyncHandler {
         if (task != null) {
             Map<String, Object> taskMap = Task.getMap(task);
             Call<Task> taskCall;
-            if (task.getId() < 2000_000_000) {
+            if (task.getId()  >= 1000_000_000) {
                 taskCall = taskAPI.createTask(taskMap);
             } else {
                 taskCall = taskAPI.updateTask(task.getId(), taskMap);
