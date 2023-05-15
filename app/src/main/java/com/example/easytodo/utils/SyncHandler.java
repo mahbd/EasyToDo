@@ -1,8 +1,16 @@
 package com.example.easytodo.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.Manifest;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.example.easytodo.enums.ActionEnum;
@@ -37,8 +45,19 @@ public class SyncHandler {
     }
 
     public void sync() {
-        fetch();
-        push();
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            Network network = connectivityManager.getActiveNetwork();
+            if (network != null) {
+                NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+                if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                    fetch();
+                    push();
+                }
+            }
+        } else {
+            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.INTERNET}, 100);
+        }
     }
 
     public void fetch() {
