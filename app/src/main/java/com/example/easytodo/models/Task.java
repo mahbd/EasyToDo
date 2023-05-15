@@ -192,6 +192,10 @@ public class Task extends RealmObject {
         delete(id, true);
     }
 
+    public static void deleteAll() {
+        Realm.getDefaultInstance().executeTransaction(realm -> realm.delete(Task.class));
+    }
+
     public static Map<String, Object> getMap(Task task) {
         Map<String, Object> taskMap = new HashMap<>();
         if (task.getTitle() != null && !task.getTitle().isEmpty())

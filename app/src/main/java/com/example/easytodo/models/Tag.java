@@ -79,6 +79,10 @@ public class Tag extends RealmObject {
         delete(id, true);
     }
 
+    public static void deleteAll() {
+        Realm.getDefaultInstance().executeTransaction(realm -> realm.delete(Tag.class));
+    }
+
     public static boolean exists(String title) {
         return Realm.getDefaultInstance().where(Tag.class).equalTo("title", title).count() > 0;
     }

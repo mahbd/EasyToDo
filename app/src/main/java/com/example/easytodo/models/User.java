@@ -33,4 +33,8 @@ public class User extends RealmObject {
     public void save() {
         Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealm(User.this));
     }
+
+    public static void deleteAll() {
+        Realm.getDefaultInstance().executeTransaction(realm -> realm.delete(User.class));
+    }
 }

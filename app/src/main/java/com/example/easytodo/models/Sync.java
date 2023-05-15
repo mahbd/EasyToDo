@@ -40,6 +40,10 @@ public class Sync extends RealmObject {
         });
     }
 
+    public static void deleteAll() {
+        Realm.getDefaultInstance().executeTransaction(realm -> realm.delete(Sync.class));
+    }
+
     public long getId() {
         return id;
     }
@@ -52,6 +56,7 @@ public class Sync extends RealmObject {
         return dataId;
     }
 
+    @SuppressWarnings("unused")
     public String getAction() {
         return action;
     }

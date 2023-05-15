@@ -19,6 +19,7 @@ import com.example.easytodo.models.Token;
 import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.UserAPI;
 import com.example.easytodo.utils.H;
+import com.example.easytodo.utils.SyncHandler;
 
 import java.util.Map;
 
@@ -51,6 +52,8 @@ public class LoginForm extends Fragment {
                         prefs.edit().putString("refresh", token.get("refresh")).apply();
                         Token.access = token.get("access");
                         Token.refresh = token.get("refresh");
+                        SyncHandler syncHandler = new SyncHandler(requireContext());
+                        syncHandler.sync();
                         requireActivity().onBackPressed();
                     } catch (Exception e) {
                         e.printStackTrace();

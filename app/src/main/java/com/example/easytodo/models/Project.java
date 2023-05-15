@@ -111,6 +111,11 @@ public class Project extends RealmObject {
         delete(id, true);
     }
 
+
+    public static void deleteAll() {
+        Realm.getDefaultInstance().executeTransaction(realm -> realm.delete(Project.class));
+    }
+
     public static boolean exists(String title) {
         return Realm.getDefaultInstance().where(Project.class).equalTo("title", title).count() > 0;
     }
