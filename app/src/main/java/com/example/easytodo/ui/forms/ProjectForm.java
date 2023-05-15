@@ -13,11 +13,16 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.easytodo.databinding.FragmentProjectFormBinding;
+import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.models.Project;
+import com.example.easytodo.utils.Events;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+import io.realm.Realm;
 
 
 public class ProjectForm extends Fragment {
@@ -27,6 +32,24 @@ public class ProjectForm extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentProjectFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        long projectId;
+        Project project = null;
+        if (getArguments() != null) {
+            projectId = getArguments().getLong("project");
+            project = Realm.getDefaultInstance().where(Project.class).equalTo("id", projectId).findFirst();
+            if (project != null) {
+                binding.etApTitle.setText(project.getTitle());
+                binding.etApDescription.setText(project.getDescription());
+                OffsetDateTime deadline = project.getDeadline();
+                if (deadline != null) {
+                    LocalDateTime localDateTime = deadline.toLocalDateTime();
+                    binding.etApDate.setText(localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                    binding.etApTime.setText(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+                }
+                binding.btnApSave.setText("Update Project");
+            }
+        }
 
         binding.etApDate.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext());
@@ -47,6 +70,7 @@ public class ProjectForm extends Fragment {
             timePickerDialog.show();
         });
 
+        Project finalProject = project;
         binding.btnApSave.setOnClickListener(v -> {
             String deadline;
             String date = binding.etApDate.getText().toString();
@@ -69,14 +93,23 @@ public class ProjectForm extends Fragment {
                 binding.etApTitle.setError("Title is required");
                 return;
             }
-            if (Project.exists(title)) {
+            if ((finalProject == null && Project.exists(title)) || (finalProject != null && Project.exists(title) && !finalProject.getTitle().equals(title))) {
                 binding.etApTitle.setError("Title already exists");
                 return;
             }
             binding.etApTitle.setError(null);
 
-            Project project = new Project(title, description, dateTime);
-            project.save();
+            if (finalProject != null) {
+                Realm.getDefaultInstance().executeTransaction(realm -> {
+                    finalProject.setTitle(title);
+                    finalProject.setDescription(description);
+                    finalProject.setDeadline(dateTime);
+                });
+                Events.notifyProjectListeners(finalProject.getId(), ActionEnum.UPDATE);
+            } else {
+                Project newProject = new Project(title, description, dateTime);
+                newProject.save();
+            }
             requireActivity().onBackPressed();
         });
 

@@ -97,6 +97,13 @@ public class SyncHandler {
     }
 
     public void delete(Change change) {
+        if (change.getTable().equals(TableEnum.TAG.getValue())) {
+            Tag.delete(change.getData_id(), false);
+        } else if (change.getTable().equals(TableEnum.PROJECT.getValue())) {
+            Project.delete(change.getData_id(), false);
+        } else if (change.getTable().equals(TableEnum.TASK.getValue())) {
+            Task.delete(change.getData_id(), false);
+        }
     }
 
     public void createOrUpdateTag(long tagId) {
@@ -157,6 +164,8 @@ public class SyncHandler {
                     }
                 }
             });
+        } else {
+            H.enqueueReq(taskAPI.deleteTask(sync.getDataId()), (call, response) -> Sync.delete(sync.getId()));
         }
     }
 
@@ -188,6 +197,8 @@ public class SyncHandler {
                     }
                 }
             });
+        } else {
+            H.enqueueReq(projectAPI.deleteProject(sync.getDataId()), (call, response) -> Sync.delete(sync.getId()));
         }
     }
 

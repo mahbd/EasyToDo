@@ -6,6 +6,7 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -23,4 +24,7 @@ public interface ProjectAPI {
 
     @PUT("projects/{id}/")
     Call<Project> updateProject(@Path("id") long id, @Body Map<String, Object> body);
+
+    @DELETE("projects/{id}/")
+    Call<Void> deleteProject(@Path("id") long id);
 }

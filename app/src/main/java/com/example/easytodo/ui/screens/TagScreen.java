@@ -37,8 +37,7 @@ public class TagScreen extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, tagNames);
         binding.tagList.setAdapter(adapter);
 
-        binding.btnNewTag.setOnClickListener(v -> Navigation.findNavController(requireActivity(),
-                R.id.fragment_container).navigate(R.id.nav_tag_form));
+        binding.btnNewTag.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_tag_form));
 
         binding.tagList.setOnItemLongClickListener((parent, view, position, id) -> {
             PopupMenu popupMenu = new PopupMenu(requireContext(), view);

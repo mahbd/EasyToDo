@@ -40,5 +40,31 @@ public class MainApplication extends Application {
                 sync.save();
             }
         });
+
+        Events.setProjectListener((projectId, action) -> {
+            if (action == ActionEnum.UPDATE) {
+                RealmResults<Sync> syncs = realm.where(Sync.class)
+                        .equalTo("table", TableEnum.PROJECT.getValue())
+                        .equalTo("dataId", projectId).findAll();
+                if (syncs != null && syncs.size() > 0) {
+                    realm.executeTransaction(realm1 -> syncs.deleteAllFromRealm());
+                }
+                Sync sync = new Sync(TableEnum.PROJECT, projectId, ActionEnum.UPDATE);
+                sync.save();
+            }
+        });
+
+        Events.setTaskListener((taskId, action) -> {
+            if (action == ActionEnum.UPDATE) {
+                RealmResults<Sync> syncs = realm.where(Sync.class)
+                        .equalTo("table", TableEnum.TASK.getValue())
+                        .equalTo("dataId", taskId).findAll();
+                if (syncs != null && syncs.size() > 0) {
+                    realm.executeTransaction(realm1 -> syncs.deleteAllFromRealm());
+                }
+                Sync sync = new Sync(TableEnum.TASK, taskId, ActionEnum.UPDATE);
+                sync.save();
+            }
+        });
     }
 }

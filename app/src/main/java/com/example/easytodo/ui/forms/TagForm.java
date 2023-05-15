@@ -24,7 +24,7 @@ public class TagForm extends Fragment {
         binding = FragmentTagFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        long tagId = 0L;
+        long tagId;
         Tag tag = null;
         if (getArguments() != null) {
             tagId = getArguments().getLong("tag");

@@ -61,6 +61,18 @@ public class Project extends RealmObject {
         return deadline.toString();
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setDeadline(OffsetDateTime deadline) {
+        this.deadline = deadline.toString();
+    }
+
     public void save(boolean change) {
         if (id == 0) {
             Number maxId = Realm.getDefaultInstance().where(Project.class).max("id");
