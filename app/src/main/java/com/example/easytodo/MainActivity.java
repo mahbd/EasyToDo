@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         ws = H.createWebSocket(prefs.getString("access", ""), text -> {
             SyncHandler syncHandler = new SyncHandler(this);
-            syncHandler.sync();
+            syncHandler.fetch();
             return true;
         });
 
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             swipeRefreshLayout.setRefreshing(true);
             SyncHandler syncHandler = new SyncHandler(this);
-            syncHandler.sync();
+            syncHandler.fetch();
             try {
                 ws.close(1000, "Refresh connection");
             } catch (Exception e) {

@@ -51,7 +51,7 @@ public class Task extends RealmObject {
         this.user = user;
     }
 
-    public Task(String title, String description, OffsetDateTime deadline) {
+    public Task(String title, String description, OffsetDateTime deadline, String project_title, String tag_title) {
         this.title = title;
         this.description = description;
         this.deadline = deadline.toString();
@@ -60,8 +60,11 @@ public class Task extends RealmObject {
         this.occurrence = 0;
         this.priority = 0;
         this.tag_titles = new RealmList<>();
+        if (tag_title != null && !tag_title.isEmpty()) {
+            this.tag_titles.add(tag_title);
+        }
         this.reminder = 0;
-        this.project_title = "";
+        this.project_title = project_title;
         this.user = 0;
     }
 
@@ -131,6 +134,13 @@ public class Task extends RealmObject {
         return tag_titles;
     }
 
+    public void setTag(String tag) {
+        this.tag_titles = new RealmList<>();
+        if (tag != null && !tag.isEmpty()) {
+            this.tag_titles.add(tag);
+        }
+    }
+
     public String getTagsString() {
         StringBuilder tagsString = new StringBuilder();
         for (String tag : tag_titles) {
@@ -150,6 +160,10 @@ public class Task extends RealmObject {
             return "";
         }
         return project_title;
+    }
+
+    public void setProject(String project) {
+        this.project_title = project;
     }
 
     public long getUser() {

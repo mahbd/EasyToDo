@@ -14,7 +14,7 @@
             android:id="@+id/task_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
+            android:layout_margin="10dp"
             android:cacheColorHint="@android:color/transparent"
             android:divider="@null"
             android:dividerHeight="10dp"
