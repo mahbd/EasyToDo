@@ -11,6 +11,10 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,6 +61,26 @@ public class H {
         Handler handler = new Handler();
         Runnable runnable = () -> func.apply(null);
         handler.postDelayed(runnable, delay);
+    }
+
+    public static WebSocket createWebSocket(String token, Function<String, Boolean> onMessage) {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(WS_URL)
+                .build();
+
+        return client.newWebSocket(request, new WebSocketListener() {
+            @Override
+            public void onOpen(@NonNull WebSocket webSocket, @NonNull okhttp3.Response response) {
+                webSocket.send("{\"access_token\": \"" + token + "\"}");
+            }
+
+            @Override
+            public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
+                onMessage.apply(text);
+            }
+        });
     }
 
 }

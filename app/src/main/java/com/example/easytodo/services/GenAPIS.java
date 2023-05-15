@@ -16,8 +16,8 @@ public class GenAPIS {
 
     public static OkHttpClient.Builder getHttpClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.authenticator(new TokenAuthenticator())
-                .addInterceptor(new AuthInterceptor(Token.access));
+        httpClient.addInterceptor(new AuthInterceptor(Token.access));
+//                .authenticator(new TokenAuthenticator());
         return httpClient;
     }
 

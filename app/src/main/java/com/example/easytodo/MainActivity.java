@@ -31,13 +31,18 @@ import com.example.easytodo.utils.H;
 import com.example.easytodo.utils.SyncHandler;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.Map;
+
+import okhttp3.WebSocket;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
+    private WebSocket ws;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +53,27 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         UserAPI userAPI = GenAPIS.getUserAPI();
-        Map<String, String> body = Map.of("access", Token.refresh);
+        Map<String, String> body = Map.of("token", prefs.getString("access", ""));
         H.enqueueReq(userAPI.verifyToken(body), (call, response) -> {
-            if (!response.isSuccessful()) {
+            if (response.code() == 401) {
                 Token.refreshToken(this);
             } else {
+                if (response.code() == 400 && response.errorBody() != null) {
+                    try {
+                        JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
+                        System.out.println(error);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 System.out.println("Token is valid");
             }
+        });
+
+        ws = H.createWebSocket(prefs.getString("access", ""), text -> {
+            SyncHandler syncHandler = new SyncHandler(this);
+            syncHandler.sync();
+            return true;
         });
 
         setSupportActionBar(binding.appBarMain.toolbar);
@@ -75,12 +94,22 @@ public class MainActivity extends AppCompatActivity {
 
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.refreshLayout);
         swipeRefreshLayout.setOnRefreshListener(() -> {
+            swipeRefreshLayout.setRefreshing(true);
             SyncHandler syncHandler = new SyncHandler(this);
             syncHandler.sync();
+            try {
+                ws.close(1000, "Refresh connection");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ws = H.createWebSocket(prefs.getString("access", ""), text -> {
+                syncHandler.sync();
+                return true;
+            });
             swipeRefreshLayout.setRefreshing(false);
         });
 
-        if (prefs.getString("access", null) == null) {
+        if (prefs.getString("access", "").isEmpty()) {
             navController.navigate(R.id.nav_login_form);
         }
     }
@@ -116,5 +145,11 @@ public class MainActivity extends AppCompatActivity {
             return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        ws.close(1000, "Activity destroyed");
+        super.onDestroy();
     }
 }
