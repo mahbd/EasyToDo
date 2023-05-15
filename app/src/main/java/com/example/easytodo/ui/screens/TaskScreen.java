@@ -14,6 +14,7 @@ import com.example.easytodo.R;
 import com.example.easytodo.adapters.TasksAdapter;
 import com.example.easytodo.databinding.FragmentTaskBinding;
 import com.example.easytodo.models.Task;
+import com.example.easytodo.utils.Events;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ import io.realm.Realm;
 
 public class TaskScreen extends Fragment {
     private FragmentTaskBinding binding;
+    Events.TaskListener taskListener;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -58,11 +60,15 @@ public class TaskScreen extends Fragment {
             return false;
         });
 
+        taskListener = (taskId, action) -> requireActivity().recreate();
+        Events.addTaskListener(taskListener);
+
         return root;
     }
 
     @Override
     public void onDestroyView() {
+        Events.removeTaskListener(taskListener);
         super.onDestroyView();
         binding = null;
     }

@@ -15,6 +15,7 @@ import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentTagBinding;
 import com.example.easytodo.models.Sync;
 import com.example.easytodo.models.Tag;
+import com.example.easytodo.utils.Events;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -22,6 +23,7 @@ import io.realm.RealmResults;
 
 public class TagScreen extends Fragment {
     private FragmentTagBinding binding;
+    Events.TagListener tagListener;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -63,11 +65,15 @@ public class TagScreen extends Fragment {
             return false;
         });
 
+        tagListener = (tagId, action) -> requireActivity().recreate();
+        Events.addTagListener(tagListener);
+
         return root;
     }
 
     @Override
     public void onDestroyView() {
+        Events.removeTagListener(tagListener);
         super.onDestroyView();
         binding = null;
     }

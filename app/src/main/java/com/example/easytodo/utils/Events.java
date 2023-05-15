@@ -12,8 +12,12 @@ public class Events {
 
     static private final List<TagListener> tagListeners = new ArrayList<>();
 
-    public static void setTagListener(TagListener listener) {
+    public static void addTagListener(TagListener listener) {
         tagListeners.add(listener);
+    }
+
+    public static void removeTagListener(TagListener listener) {
+        tagListeners.remove(listener);
     }
 
     public static void notifyTagListeners(long tagId, ActionEnum action) {
@@ -27,8 +31,12 @@ public class Events {
 
     static private final List<ProjectListener> projectListeners = new ArrayList<>();
 
-    public static void setProjectListener(ProjectListener listener) {
+    public static void addProjectListener(ProjectListener listener) {
         projectListeners.add(listener);
+    }
+
+    public static void removeProjectListener(ProjectListener listener) {
+        projectListeners.remove(listener);
     }
 
     public static void notifyProjectListeners(long projectId, ActionEnum action) {
@@ -42,8 +50,12 @@ public class Events {
 
     static private final List<TaskListener> taskListeners = new ArrayList<>();
 
-    public static void setTaskListener(TaskListener listener) {
+    public static void addTaskListener(TaskListener listener) {
         taskListeners.add(listener);
+    }
+
+    public static void removeTaskListener(TaskListener listener) {
+        taskListeners.remove(listener);
     }
 
     public static void notifyTaskListeners(long taskId, ActionEnum action) {

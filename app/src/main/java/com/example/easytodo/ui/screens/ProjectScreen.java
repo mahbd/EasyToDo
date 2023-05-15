@@ -13,7 +13,9 @@ import androidx.navigation.Navigation;
 import com.example.easytodo.R;
 import com.example.easytodo.adapters.ProjectsAdapter;
 import com.example.easytodo.databinding.FragmentProjectBinding;
+import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.models.Project;
+import com.example.easytodo.utils.Events;
 
 import java.util.List;
 
@@ -22,6 +24,7 @@ import io.realm.Realm;
 
 public class ProjectScreen extends Fragment {
     private FragmentProjectBinding binding;
+    Events.ProjectListener projectListener;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -58,11 +61,15 @@ public class ProjectScreen extends Fragment {
             return false;
         });
 
+        projectListener = (projectId, action) -> requireActivity().recreate();
+        Events.addProjectListener(projectListener);
+
         return root;
     }
 
     @Override
     public void onDestroyView() {
+        Events.removeProjectListener(projectListener);
         super.onDestroyView();
         binding = null;
     }

@@ -33,7 +33,7 @@ public class MainApplication extends Application {
 
         Realm realm = Realm.getDefaultInstance();
 
-        Events.setTagListener((tagId, action) -> {
+        Events.addTagListener((tagId, action) -> {
             if (action == ActionEnum.UPDATE) {
                 RealmResults<Sync> syncs = realm.where(Sync.class)
                         .equalTo("table", TableEnum.TAG.getValue())
@@ -44,9 +44,11 @@ public class MainApplication extends Application {
                 Sync sync = new Sync(TableEnum.TAG, tagId, ActionEnum.UPDATE);
                 sync.save();
             }
+
+            new SyncHandler(this).sync();
         });
 
-        Events.setProjectListener((projectId, action) -> {
+        Events.addProjectListener((projectId, action) -> {
             if (action == ActionEnum.UPDATE) {
                 RealmResults<Sync> syncs = realm.where(Sync.class)
                         .equalTo("table", TableEnum.PROJECT.getValue())
@@ -57,9 +59,11 @@ public class MainApplication extends Application {
                 Sync sync = new Sync(TableEnum.PROJECT, projectId, ActionEnum.UPDATE);
                 sync.save();
             }
+
+            new SyncHandler(this).sync();
         });
 
-        Events.setTaskListener((taskId, action) -> {
+        Events.addTaskListener((taskId, action) -> {
             if (action == ActionEnum.UPDATE) {
                 RealmResults<Sync> syncs = realm.where(Sync.class)
                         .equalTo("table", TableEnum.TASK.getValue())
