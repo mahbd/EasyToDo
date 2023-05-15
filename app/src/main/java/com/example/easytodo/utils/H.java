@@ -1,6 +1,9 @@
 package com.example.easytodo.utils;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -11,6 +14,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class H {
+    public interface SimpleAlertCallback {
+        public void onOk();
+    }
+
     public interface EnqueueReq<T> {
         void onResponse(@NonNull Call<T> call, @NonNull Response<T> response);
     }
@@ -32,6 +39,16 @@ public class H {
     public static String currentUTCISO8601() {
         LocalDateTime dateTime = LocalDateTime.now(ZoneOffset.UTC);
         return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+    }
+
+    public static void showAlert(Context context, String title, String message, SimpleAlertCallback callback) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton("Ok", (dialog, which) -> {
+            callback.onOk();
+        });
+        builder.show();
     }
 
 }

@@ -1,15 +1,13 @@
 package com.example.easytodo.utils;
 
-import android.app.Activity;
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
-import android.Manifest;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
@@ -45,7 +43,7 @@ public class SyncHandler {
     }
 
     public void sync() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             Network network = connectivityManager.getActiveNetwork();
             if (network != null) {
@@ -53,11 +51,12 @@ public class SyncHandler {
                 if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                     fetch();
                     push();
+                    return;
                 }
             }
-        } else {
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.INTERNET}, 100);
         }
+        H.showAlert(context, "No internet", "Connect to internet", () -> {
+        });
     }
 
     public void fetch() {
@@ -184,7 +183,11 @@ public class SyncHandler {
                 }
             });
         } else {
-            H.enqueueReq(taskAPI.deleteTask(sync.getDataId()), (call, response) -> Sync.delete(sync.getId()));
+            H.enqueueReq(taskAPI.deleteTask(sync.getDataId()), (call, response) -> {
+                if (sync.isValid()) {
+                    Sync.delete(sync.getId());
+                }
+            });
         }
     }
 
@@ -217,7 +220,11 @@ public class SyncHandler {
                 }
             });
         } else {
-            H.enqueueReq(projectAPI.deleteProject(sync.getDataId()), (call, response) -> Sync.delete(sync.getId()));
+            H.enqueueReq(projectAPI.deleteProject(sync.getDataId()), (call, response) -> {
+                if (sync.isValid()) {
+                    Sync.delete(sync.getId());
+                }
+            });
         }
     }
 
@@ -251,7 +258,11 @@ public class SyncHandler {
                 }
             });
         } else {
-            H.enqueueReq(tagAPI.deleteTag(sync.getDataId()), (call, response) -> Sync.delete(sync.getId()));
+            H.enqueueReq(tagAPI.deleteTag(sync.getDataId()), (call, response) -> {
+                if (sync.isValid()) {
+                    Sync.delete(sync.getId());
+                }
+            });
         }
     }
 }

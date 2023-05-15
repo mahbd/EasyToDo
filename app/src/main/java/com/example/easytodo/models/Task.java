@@ -3,6 +3,7 @@ package com.example.easytodo.models;
 
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
+import com.example.easytodo.utils.Events;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -157,11 +158,11 @@ public class Task extends RealmObject {
     public void save(boolean change) {
         if (id == 0) {
             Number maxId = Realm.getDefaultInstance().where(Task.class).max("id");
-            id = maxId == null ? 1000_000_000 : maxId.longValue() + 1;
+            id = maxId == null || maxId.longValue() < 1000_000_000 ? 1000_000_000 : maxId.longValue() + 1;
         }
 
         Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealmOrUpdate(Task.this));
-
+        Events.notifyTaskListeners(getId(), ActionEnum.CREATE);
         if (change) {
             Sync sync = new Sync(TableEnum.TASK, id, ActionEnum.CREATE);
             sync.save();
@@ -183,6 +184,7 @@ public class Task extends RealmObject {
         });
 
         if (change && deleted.get()) {
+            Events.notifyTaskListeners(id, ActionEnum.DELETE);
             Sync sync = new Sync(TableEnum.TASK, id, ActionEnum.DELETE);
             sync.save();
         }
