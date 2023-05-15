@@ -10,6 +10,7 @@ import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.models.Sync;
 import com.example.easytodo.models.Token;
 import com.example.easytodo.utils.Events;
+import com.example.easytodo.utils.SyncHandler;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -69,6 +70,8 @@ public class MainApplication extends Application {
                 Sync sync = new Sync(TableEnum.TASK, taskId, ActionEnum.UPDATE);
                 sync.save();
             }
+
+            new SyncHandler(this).sync();
         });
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

@@ -54,6 +54,7 @@ public class TagScreen extends Fragment {
                     Tag tag = tags.get(position);
                     if (tag != null) {
                         Tag.delete(tag.getId());
+                        requireActivity().recreate();
                     }
                 }
                 return true;

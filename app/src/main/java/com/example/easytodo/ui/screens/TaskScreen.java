@@ -49,6 +49,7 @@ public class TaskScreen extends Fragment {
                     Task task = tasks.get(position);
                     if (task != null) {
                         Task.delete(task.getId());
+                        requireActivity().recreate();
                     }
                 }
                 return true;

@@ -1,6 +1,7 @@
 package com.example.easytodo.utils;
 
 import android.content.Context;
+import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Function;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,6 +51,12 @@ public class H {
             callback.onOk();
         });
         builder.show();
+    }
+
+    public static void runDelay(Function func, int delay) {
+        Handler handler = new Handler();
+        Runnable runnable = () -> func.apply(null);
+        handler.postDelayed(runnable, delay);
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.easytodo.models;
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.utils.Events;
+import com.example.easytodo.utils.H;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -81,8 +82,10 @@ public class Project extends RealmObject {
         }
 
         Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealmOrUpdate(Project.this));
-        Events.notifyProjectListeners(getId(), ActionEnum.CREATE);
-
+        H.runDelay((v) -> {
+            Events.notifyProjectListeners(id, ActionEnum.CREATE);
+            return true;
+        }, 2000);
         if (change) {
             Sync sync = new Sync(TableEnum.PROJECT, id, ActionEnum.CREATE);
             sync.save();
@@ -104,7 +107,10 @@ public class Project extends RealmObject {
         });
 
         if (change && deleted.get()) {
-            Events.notifyProjectListeners(id, ActionEnum.DELETE);
+            H.runDelay((v) -> {
+                Events.notifyProjectListeners(id, ActionEnum.DELETE);
+                return true;
+            }, 2000);
             Sync sync = new Sync(TableEnum.PROJECT, id, ActionEnum.DELETE);
             sync.save();
         }

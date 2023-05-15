@@ -49,6 +49,7 @@ public class ProjectScreen extends Fragment {
                     Project project = projects.get(position);
                     if (project != null) {
                         Project.delete(project.getId());
+                        requireActivity().recreate();
                     }
                 }
                 return true;

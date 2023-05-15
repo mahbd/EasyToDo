@@ -49,6 +49,7 @@ public class HomeScreen extends Fragment {
                     if (task != null) {
                         Task.delete(task.getId());
                     }
+                    requireActivity().recreate();
                 }
                 return true;
             });

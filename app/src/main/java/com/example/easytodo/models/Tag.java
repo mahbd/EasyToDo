@@ -4,6 +4,7 @@ package com.example.easytodo.models;
 import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.utils.Events;
+import com.example.easytodo.utils.H;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +51,10 @@ public class Tag extends RealmObject {
         }
 
         Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealmOrUpdate(Tag.this));
-        Events.notifyTagListeners(getId(), ActionEnum.CREATE);
+        H.runDelay((v) -> {
+            Events.notifyTagListeners(id, ActionEnum.CREATE);
+            return true;
+        }, 2000);
         if (change) {
             Sync sync = new Sync(TableEnum.TAG, id, ActionEnum.CREATE);
             sync.save();
@@ -72,7 +76,10 @@ public class Tag extends RealmObject {
         });
 
         if (change && deleted.get()) {
-            Events.notifyTagListeners(id, ActionEnum.DELETE);
+            H.runDelay((v) -> {
+                Events.notifyTagListeners(id, ActionEnum.DELETE);
+                return true;
+            }, 2000);
             Sync sync = new Sync(TableEnum.TAG, id, ActionEnum.DELETE);
             sync.save();
         }

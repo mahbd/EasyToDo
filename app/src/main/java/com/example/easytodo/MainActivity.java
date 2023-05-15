@@ -16,6 +16,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.preference.PreferenceManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.easytodo.databinding.ActivityMainBinding;
 import com.example.easytodo.models.Project;
@@ -23,6 +24,7 @@ import com.example.easytodo.models.Sync;
 import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.Task;
 import com.example.easytodo.models.User;
+import com.example.easytodo.utils.SyncHandler;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -54,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.fragment_container);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.refreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            SyncHandler syncHandler = new SyncHandler(this);
+            syncHandler.sync();
+            swipeRefreshLayout.setRefreshing(false);
+        });
 
         if (prefs.getString("access", null) == null) {
             navController.navigate(R.id.nav_login_form);
