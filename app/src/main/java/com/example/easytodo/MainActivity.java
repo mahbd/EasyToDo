@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        UserAPI userAPI = GenAPIS.getUserAPI();
+        UserAPI userAPI = GenAPIS.getAPI(UserAPI.class, false);
         Map<String, String> body = Map.of("token", prefs.getString("access", ""));
         H.enqueueReq(userAPI.verifyToken(body), (call, response) -> {
             if (response.code() == 401) {

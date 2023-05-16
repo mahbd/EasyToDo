@@ -118,6 +118,10 @@ public class Task extends RealmObject {
         return completed;
     }
 
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
     public int getOccurrence() {
         return occurrence;
     }

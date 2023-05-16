@@ -23,7 +23,7 @@ public class Token {
 
     public static void refreshToken(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        UserAPI userAPI = GenAPIS.getUserAPI();
+        UserAPI userAPI = GenAPIS.getAPI(UserAPI.class, false);
         Map<String, String> body = Map.of("refresh", prefs.getString("refresh", ""));
         Call<Map<String, String>> tokenCall = userAPI.refreshToken(body);
 
@@ -58,7 +58,7 @@ public class Token {
     }
 
     public static String refreshToken() {
-        UserAPI userAPI = GenAPIS.getUserAPI();
+        UserAPI userAPI = GenAPIS.getAPI(UserAPI.class, false);
         Map<String, String> body = Map.of("refresh", Token.refresh);
         Call<Map<String, String>> tokenCall = userAPI.refreshToken(body);
 

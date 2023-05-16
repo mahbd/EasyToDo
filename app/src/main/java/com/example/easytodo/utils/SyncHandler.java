@@ -18,11 +18,13 @@ import com.example.easytodo.models.Project;
 import com.example.easytodo.models.Sync;
 import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.Task;
+import com.example.easytodo.models.User;
 import com.example.easytodo.services.ChangeAPI;
 import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.ProjectAPI;
 import com.example.easytodo.services.TagAPI;
 import com.example.easytodo.services.TaskAPI;
+import com.example.easytodo.services.UserAPI;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -61,7 +63,7 @@ public class SyncHandler {
 
     public void fetch() {
         String lastSync = prefs.getString("last_sync", null);
-        ChangeAPI changeAPI = GenAPIS.getChangeAPI();
+        ChangeAPI changeAPI = GenAPIS.getAPI(ChangeAPI.class);
         if (lastSync == null) {
             H.enqueueReq(changeAPI.getChanges(), (call, response) -> {
                 if (response.isSuccessful() && response.body() != null) {
@@ -110,7 +112,9 @@ public class SyncHandler {
         } else if (change.getTable().equals(TableEnum.PROJECT.getValue())) {
             createOrUpdateProject(change.getData_id());
         } else if (change.getTable().equals(TableEnum.TASK.getValue())) {
-            createTask(change.getData_id());
+            createOrUpdateTask(change.getData_id());
+        } else if (change.getTable().equals(TableEnum.USER.getValue())) {
+            createOrUpdateUser(change.getData_id());
         }
     }
 
@@ -125,7 +129,7 @@ public class SyncHandler {
     }
 
     public void createOrUpdateTag(long tagId) {
-        TagAPI tagAPI = GenAPIS.getTagAPI();
+        TagAPI tagAPI = GenAPIS.getAPI(TagAPI.class);
         H.enqueueReq(tagAPI.getTag(tagId), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {
                 Tag tag = response.body();
@@ -135,7 +139,7 @@ public class SyncHandler {
     }
 
     public void createOrUpdateProject(long projectId) {
-        ProjectAPI projectAPI = GenAPIS.getProjectAPI();
+        ProjectAPI projectAPI = GenAPIS.getAPI(ProjectAPI.class);
         H.enqueueReq(projectAPI.getProject(projectId), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {
                 Project project = response.body();
@@ -144,8 +148,18 @@ public class SyncHandler {
         });
     }
 
-    public void createTask(long taskId) {
-        TaskAPI taskAPI = GenAPIS.getTaskAPI();
+    public void createOrUpdateUser(long userId) {
+        UserAPI userAPI = GenAPIS.getAPI(UserAPI.class);
+        H.enqueueReq(userAPI.getUser(userId), (call, response) -> {
+            if (response.isSuccessful() && response.body() != null) {
+                User user = response.body();
+                user.save();
+            }
+        });
+    }
+
+    public void createOrUpdateTask(long taskId) {
+        TaskAPI taskAPI = GenAPIS.getAPI(TaskAPI.class);
         H.enqueueReq(taskAPI.getTask(taskId), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {
                 Task task = response.body();
@@ -155,7 +169,7 @@ public class SyncHandler {
     }
 
     public static void pushTask(Sync sync) {
-        TaskAPI taskAPI = GenAPIS.getTaskAPI();
+        TaskAPI taskAPI = GenAPIS.getAPI(TaskAPI.class);
         Task task = Realm.getDefaultInstance().where(Task.class).equalTo("id", sync.getDataId()).findFirst();
         if (task != null) {
             Map<String, Object> taskMap = Task.getMap(task);
@@ -192,7 +206,7 @@ public class SyncHandler {
     }
 
     public static void pushProject(Sync sync) {
-        ProjectAPI projectAPI = GenAPIS.getProjectAPI();
+        ProjectAPI projectAPI = GenAPIS.getAPI(ProjectAPI.class);
         Project project = Realm.getDefaultInstance().where(Project.class).equalTo("id", sync.getDataId()).findFirst();
         if (project != null) {
             Map<String, Object> projectMap = Project.getMap(project);
@@ -229,7 +243,7 @@ public class SyncHandler {
     }
 
     public static void pushTag(Sync sync) {
-        TagAPI tagAPI = GenAPIS.getTagAPI();
+        TagAPI tagAPI = GenAPIS.getAPI(TagAPI.class);
         Tag tag = Realm.getDefaultInstance().where(Tag.class).equalTo("id", sync.getDataId()).findFirst();
         if (tag != null) {
             Map<String, Object> tagMap = Tag.getMap(tag);

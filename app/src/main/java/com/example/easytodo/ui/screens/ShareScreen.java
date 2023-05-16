@@ -33,7 +33,7 @@ public class ShareScreen extends Fragment {
 
         String USER = "mah";
 
-        ShareAPI shareAPI = GenAPIS.getShareAPI();
+        ShareAPI shareAPI = GenAPIS.getAPI(ShareAPI.class);
         Map<String, String> query = Map.of("user__username", USER, "table", TableEnum.PROJECT.getValue());
         H.enqueueReq(shareAPI.getShares(query), (call, response) -> {
             if (response.isSuccessful() && response.body() != null) {

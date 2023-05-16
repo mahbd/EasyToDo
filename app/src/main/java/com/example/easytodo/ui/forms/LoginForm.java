@@ -48,7 +48,7 @@ public class LoginForm extends Fragment {
             String username = binding.etUsername.getText().toString();
             String password = binding.etPassword.getText().toString();
 
-            UserAPI userAPI = GenAPIS.getUserAPI();
+            UserAPI userAPI = GenAPIS.getAPI(UserAPI.class, false);
             Map<String, String> body = Map.of("username", username, "password", password);
             Call<Map<String, String>> tokenCall = userAPI.getToken(body);
             H.enqueueReq(tokenCall, (call, response) -> {

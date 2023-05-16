@@ -59,7 +59,7 @@ public class RegisterForm extends Fragment {
                 return;
             }
 
-            UserAPI userAPI = GenAPIS.getUserAPI();
+            UserAPI userAPI = GenAPIS.getAPI(UserAPI.class, false);
             Call<User> registerUser = userAPI.registerUser(body);
             H.enqueueReq(registerUser, (call, response) -> {
                 if (response.isSuccessful()) {

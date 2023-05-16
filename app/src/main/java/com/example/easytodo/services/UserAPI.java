@@ -11,6 +11,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface UserAPI {
     @POST("auth/jwt/create/")
@@ -27,4 +28,7 @@ public interface UserAPI {
 
     @GET("users/")
     Call<List<User>> getUsers();
+
+    @GET("users/{id}/")
+    Call<User> getUser(@Path("id") long id);
 }

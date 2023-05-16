@@ -53,21 +53,16 @@ public class ShareForm extends Fragment {
                 if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                     Map<String, Long> userMap = new HashMap<>();
 
-                    UserAPI userAPI = GenAPIS.getUserAPI();
-                    ShareAPI shareAPI = GenAPIS.getShareAPI();
-                    H.enqueueReq(userAPI.getUsers(), (call, response) -> {
-                        if (response.isSuccessful() && response.body() != null) {
-                            List<User> users = response.body();
-                            List<String> usernames = new ArrayList<>();
-                            for (User user : users) {
-                                usernames.add(user.getUsername());
-                                userMap.put(user.getUsername(), user.getId());
-                            }
 
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, usernames);
-                            binding.spinnerUsername.setAdapter(adapter);
-                        }
-                    });
+                    List<String> usernames = new ArrayList<>();
+                    for (User user : Realm.getDefaultInstance().where(User.class).findAll()) {
+                        usernames.add(user.getUsername());
+                        userMap.put(user.getUsername(), user.getId());
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, usernames);
+                    binding.spinnerUsername.setAdapter(adapter);
+
 
                     List<String> itemTypes = new ArrayList<>();
                     itemTypes.add(TableEnum.TAG.getValue());
@@ -125,6 +120,7 @@ public class ShareForm extends Fragment {
                         body.put("shared_with", userId);
                         body.put("table", itemType);
                         body.put("data_id", itemId);
+                        ShareAPI shareAPI = GenAPIS.getAPI(ShareAPI.class);
                         H.enqueueReq(shareAPI.createShare(body), (call, response) -> {
                             if (response.isSuccessful()) {
                                 Toast.makeText(getContext(), "Item shared", Toast.LENGTH_SHORT).show();
