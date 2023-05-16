@@ -26,9 +26,5 @@
             android:id="@+id/nav_share"
             android:icon="@drawable/ic_menu_camera"
             android:title="Share" />
-        <item
-            android:id="@+id/nav_privacy"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Privacy" />
     </group>
 </menu>

@@ -36,44 +36,38 @@
         tools:layout="@layout/fragment_share" />
 
     <fragment
-        android:id="@+id/nav_privacy"
-        android:name="com.example.easytodo.ui.screens.PrivacyScreen"
-        android:label="Privacy"
-        tools:layout="@layout/fragment_privacy" />
-
-    <fragment
         android:id="@+id/nav_login_form"
         android:name="com.example.easytodo.ui.forms.LoginForm"
         android:label="Login"
-        tools:layout="@layout/fragment_privacy" />
+        tools:layout="@layout/fragment_login_form" />
 
     <fragment
         android:id="@+id/nav_register_form"
         android:name="com.example.easytodo.ui.forms.RegisterForm"
         android:label="Register"
-        tools:layout="@layout/fragment_privacy" />
+        tools:layout="@layout/fragment_register_form" />
 
     <fragment
         android:id="@+id/nav_task_form"
         android:name="com.example.easytodo.ui.forms.TaskForm"
         android:label="Task Form"
-        tools:layout="@layout/fragment_privacy" />
+        tools:layout="@layout/fragment_task_form" />
 
     <fragment
         android:id="@+id/nav_project_form"
         android:name="com.example.easytodo.ui.forms.ProjectForm"
         android:label="Project Form"
-        tools:layout="@layout/fragment_privacy" />
+        tools:layout="@layout/fragment_project_form" />
 
     <fragment
         android:id="@+id/nav_tag_form"
         android:name="com.example.easytodo.ui.forms.TagForm"
         android:label="Tag Form"
-        tools:layout="@layout/fragment_privacy" />
+        tools:layout="@layout/fragment_tag_form" />
 
     <fragment
         android:id="@+id/nav_share_form"
         android:name="com.example.easytodo.ui.forms.ShareForm"
         android:label="Share Form"
-        tools:layout="@layout/fragment_privacy" />
+        tools:layout="@layout/fragment_share_form" />
 </navigation>

@@ -1,6 +1,8 @@
 package com.example.easytodo.ui.forms;
 
+import android.Manifest;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -35,6 +39,10 @@ public class LoginForm extends Fragment {
         binding = FragmentLoginFormBinding.inflate(inflater, container, false);
         prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
         View root = binding.getRoot();
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.INTERNET}, 1);
+        }
 
         binding.btnLogin.setOnClickListener(v -> {
             String username = binding.etUsername.getText().toString();

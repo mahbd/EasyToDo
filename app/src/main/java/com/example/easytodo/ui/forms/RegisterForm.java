@@ -1,5 +1,7 @@
 package com.example.easytodo.ui.forms;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -32,6 +36,11 @@ public class RegisterForm extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentRegisterFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.INTERNET}, 1);
+        }
+
         FormHandler.Field[] fields = new FormHandler.Field[]{
                 new FormHandler.Field(binding.etRegUsername, "text", "username"),
                 new FormHandler.Field(binding.etRegEmail, "email", "email"),
