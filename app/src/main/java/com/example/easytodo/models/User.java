@@ -34,6 +34,15 @@ public class User extends RealmObject {
         Realm.getDefaultInstance().executeTransaction(realm -> realm.copyToRealmOrUpdate(User.this));
     }
 
+    public static void delete(long dataId) {
+        Realm.getDefaultInstance().executeTransaction(realm -> {
+            User user = realm.where(User.class).equalTo("id", dataId).findFirst();
+            if (user != null) {
+                user.deleteFromRealm();
+            }
+        });
+    }
+
     public static void deleteAll() {
         Realm.getDefaultInstance().executeTransaction(realm -> realm.delete(User.class));
     }

@@ -14,6 +14,7 @@ import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentShareBinding;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.models.Share;
+import com.example.easytodo.models.User;
 import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.ShareAPI;
 import com.example.easytodo.utils.H;
@@ -21,6 +22,8 @@ import com.example.easytodo.utils.H;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import io.realm.Realm;
 
 
 public class ShareScreen extends Fragment {
@@ -40,7 +43,8 @@ public class ShareScreen extends Fragment {
                 List<Share> shares = response.body();
                 List<Map<String, String>> psbData = new ArrayList<>();
                 for (Share share : shares) {
-                    Map<String, String> data = Map.of("title", share.getTitle(), "username", Long.toString(share.getShared_with()));
+                    User user = Realm.getDefaultInstance().where(User.class).equalTo("id", share.getShared_with()).findFirst();
+                    Map<String, String> data = Map.of("title", share.getTitle(), "username", user != null ? user.getUsername(): Long.toString(share.getShared_with()));
                     psbData.add(data);
                 }
                 SimpleAdapter adapter = getAdapter(psbData);
@@ -54,7 +58,8 @@ public class ShareScreen extends Fragment {
                 List<Share> shares = response.body();
                 List<Map<String, String>> psbData = new ArrayList<>();
                 for (Share share : shares) {
-                    Map<String, String> data = Map.of("title", share.getTitle(), "username", Long.toString(share.getUser()));
+                    User user = Realm.getDefaultInstance().where(User.class).equalTo("id", share.getUser()).findFirst();
+                    Map<String, String> data = Map.of("title", share.getTitle(), "username", user != null ? user.getUsername(): Long.toString(share.getUser()));
                     psbData.add(data);
                 }
                 SimpleAdapter adapter = getAdapter(psbData);
@@ -68,7 +73,8 @@ public class ShareScreen extends Fragment {
                 List<Share> shares = response.body();
                 List<Map<String, String>> psbData = new ArrayList<>();
                 for (Share share : shares) {
-                    Map<String, String> data = Map.of("title", share.getTitle(), "username", Long.toString(share.getShared_with()));
+                    User user = Realm.getDefaultInstance().where(User.class).equalTo("id", share.getShared_with()).findFirst();
+                    Map<String, String> data = Map.of("title", share.getTitle(), "username", user != null ? user.getUsername(): Long.toString(share.getShared_with()));
                     psbData.add(data);
                 }
                 SimpleAdapter adapter = getAdapter(psbData);
@@ -82,7 +88,8 @@ public class ShareScreen extends Fragment {
                 List<Share> shares = response.body();
                 List<Map<String, String>> psbData = new ArrayList<>();
                 for (Share share : shares) {
-                    Map<String, String> data = Map.of("title", share.getTitle(), "username", Long.toString(share.getUser()));
+                    User user = Realm.getDefaultInstance().where(User.class).equalTo("id", share.getUser()).findFirst();
+                    Map<String, String> data = Map.of("title", share.getTitle(), "username", user != null ? user.getUsername(): Long.toString(share.getUser()));
                     psbData.add(data);
                 }
                 SimpleAdapter adapter = getAdapter(psbData);

@@ -107,24 +107,27 @@ public class SyncHandler {
     }
 
     public void createOrUpdate(Change change) {
+        System.out.println("createOrUpdate: " + change.getTable() + " " + change.getdataId() + " " + change.getAction());
         if (change.getTable().equals(TableEnum.TAG.getValue())) {
-            createOrUpdateTag(change.getData_id());
+            createOrUpdateTag(change.getdataId());
         } else if (change.getTable().equals(TableEnum.PROJECT.getValue())) {
-            createOrUpdateProject(change.getData_id());
+            createOrUpdateProject(change.getdataId());
         } else if (change.getTable().equals(TableEnum.TASK.getValue())) {
-            createOrUpdateTask(change.getData_id());
+            createOrUpdateTask(change.getdataId());
         } else if (change.getTable().equals(TableEnum.USER.getValue())) {
-            createOrUpdateUser(change.getData_id());
+            createOrUpdateUser(change.getdataId());
         }
     }
 
     public void delete(Change change) {
         if (change.getTable().equals(TableEnum.TAG.getValue())) {
-            Tag.delete(change.getData_id(), false);
+            Tag.delete(change.getdataId(), false);
         } else if (change.getTable().equals(TableEnum.PROJECT.getValue())) {
-            Project.delete(change.getData_id(), false);
+            Project.delete(change.getdataId(), false);
         } else if (change.getTable().equals(TableEnum.TASK.getValue())) {
-            Task.delete(change.getData_id(), false);
+            Task.delete(change.getdataId(), false);
+        } else if (change.getTable().equals(TableEnum.USER.getValue())) {
+            User.delete(change.getdataId());
         }
     }
 

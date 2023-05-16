@@ -2,9 +2,6 @@ package com.example.easytodo.services;
 
 import com.example.easytodo.models.User;
 
-import org.json.JSONObject;
-
-import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -25,9 +22,6 @@ public interface UserAPI {
 
     @POST("auth/users/")
     Call<User> registerUser(@Body Map<String, String> body);
-
-    @GET("users/")
-    Call<List<User>> getUsers();
 
     @GET("users/{id}/")
     Call<User> getUser(@Path("id") long id);

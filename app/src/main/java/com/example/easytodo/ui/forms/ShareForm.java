@@ -139,6 +139,7 @@ public class ShareForm extends Fragment {
                         });
                     });
                 }
+                return root;
             }
         } else {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.INTERNET}, 1);

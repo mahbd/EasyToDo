@@ -21,7 +21,7 @@ public class Change {
         return table;
     }
 
-    public long getData_id() {
+    public long getdataId() {
         return data_id;
     }
 }
