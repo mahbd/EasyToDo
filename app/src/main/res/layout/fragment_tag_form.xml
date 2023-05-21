@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="30dp"
-            android:background="@drawable/custom_edit_text"
+            android:background="@drawable/rectangle"
             app:cardCornerRadius="30dp"
             app:cardElevation="20dp">
 
@@ -43,7 +43,7 @@
                     android:layout_height="@dimen/input_height"
                     android:layout_marginTop="40dp"
                     android:autofillHints=""
-                    android:background="@drawable/custom_edit_text"
+                    android:background="@drawable/rectangle"
                     android:ems="10"
                     android:hint="Tag Title"
                     android:inputType="textPersonName"

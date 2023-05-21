@@ -21,7 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"
-                android:background="@drawable/custom_edit_text"
+                android:background="@drawable/rectangle"
                 app:cardCornerRadius="30dp"
                 app:cardElevation="20dp">
 
@@ -49,7 +49,7 @@
                         android:layout_height="50dp"
                         android:layout_marginTop="40dp"
                         android:autofillHints=""
-                        android:background="@drawable/custom_edit_text"
+                        android:background="@drawable/rectangle"
                         android:drawableStart="@drawable/ic_baseline_person_24"
                         android:drawablePadding="8dp"
                         android:hint="Username"
@@ -64,7 +64,7 @@
                         android:layout_height="50dp"
                         android:layout_marginTop="20dp"
                         android:autofillHints=""
-                        android:background="@drawable/custom_edit_text"
+                        android:background="@drawable/rectangle"
                         android:drawableStart="@drawable/ic_baseline_lock_24"
                         android:drawablePadding="8dp"
                         android:hint="Password"
