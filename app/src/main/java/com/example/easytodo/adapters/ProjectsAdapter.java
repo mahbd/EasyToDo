@@ -44,14 +44,14 @@ public class ProjectsAdapter extends ArrayAdapter<Project> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View row = convertView;
-        ProjectsAdapter.ViewHolder holder;
+        ViewHolder holder;
         if (row == null) {
             LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = inflater.inflate(R.layout.project_item, parent, false);
-            holder = new ProjectsAdapter.ViewHolder(row);
+            holder = new ViewHolder(row);
             row.setTag(holder);
         } else {
-            holder = (ProjectsAdapter.ViewHolder) row.getTag();
+            holder = (ViewHolder) row.getTag();
         }
 
         Project project = getItem(position);
