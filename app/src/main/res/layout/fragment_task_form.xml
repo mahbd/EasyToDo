@@ -5,143 +5,149 @@
     android:layout_height="match_parent"
     tools:context=".ui.forms.TaskForm">
 
-    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:fillViewport="true">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="30dp"
-            android:background="@drawable/rectangle"
-            app:cardCornerRadius="30dp"
-            app:cardElevation="20dp">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="vertical"
-                android:padding="24dp">
-
-                <TextView
-                    android:id="@+id/tv_at_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Task Form"
-                    android:textAlignment="center"
-                    android:textColor="@color/purple_700"
-                    android:textSize="36sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/et_at_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/input_height"
-                    android:layout_marginTop="@dimen/input_top_margin"
-                    android:autofillHints="Enter task title"
-                    android:background="@drawable/rectangle"
-                    android:hint="Title"
-                    android:inputType="textPersonName"
-                    android:paddingHorizontal="10dp" />
-
-                <EditText
-                    android:id="@+id/et_at_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/input_top_margin"
-                    android:autofillHints=""
-                    android:background="@drawable/rectangle"
-                    android:hint="Description"
-                    android:inputType="textMultiLine"
-                    android:minHeight="@dimen/input_height"
-                    android:paddingHorizontal="10dp" />
-
+                android:layout_margin="30dp"
+                android:background="@drawable/rectangle"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/input_top_margin"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:id="@+id/tv_at_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Task Form"
+                        android:textAlignment="center"
+                        android:textColor="@color/purple_700"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
 
                     <EditText
-                        android:id="@+id/et_at_date"
-                        android:layout_width="0dp"
+                        android:id="@+id/et_at_title"
+                        android:layout_width="match_parent"
                         android:layout_height="@dimen/input_height"
-                        android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
-                        android:autofillHints=""
+                        android:layout_marginTop="@dimen/input_top_margin"
+                        android:autofillHints="Enter task title"
                         android:background="@drawable/rectangle"
-                        android:focusable="false"
-                        android:hint="Date"
-                        android:inputType="date"
+                        android:hint="Title"
+                        android:inputType="textPersonName"
                         android:paddingHorizontal="10dp" />
 
                     <EditText
-                        android:id="@+id/et_at_time"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/input_height"
-                        android:layout_marginStart="5dp"
-                        android:layout_weight="1"
+                        android:id="@+id/et_at_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/input_top_margin"
                         android:autofillHints=""
                         android:background="@drawable/rectangle"
-                        android:focusable="false"
-                        android:hint="Time"
-                        android:inputType="time"
+                        android:hint="Description"
+                        android:inputType="textMultiLine"
+                        android:minHeight="@dimen/input_height"
                         android:paddingHorizontal="10dp" />
-                </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/input_top_margin"
-                    android:baselineAligned="false"
-                    android:gravity="center"
-                    android:orientation="horizontal">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/rectangle">
+                        android:layout_marginTop="@dimen/input_top_margin"
+                        android:gravity="center"
+                        android:orientation="horizontal">
 
-                        <Spinner
-                            android:id="@+id/sp_at_project"
-                            android:layout_width="match_parent"
+                        <EditText
+                            android:id="@+id/et_at_date"
+                            android:layout_width="0dp"
                             android:layout_height="@dimen/input_height"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:background="@drawable/rectangle"
+                            android:focusable="false"
+                            android:hint="Date"
+                            android:inputType="date"
+                            android:paddingHorizontal="10dp" />
+
+                        <EditText
+                            android:id="@+id/et_at_time"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:background="@drawable/rectangle"
+                            android:focusable="false"
+                            android:hint="Time"
+                            android:inputType="time"
                             android:paddingHorizontal="10dp" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/rectangle">
+                        android:layout_marginTop="@dimen/input_top_margin"
+                        android:baselineAligned="false"
+                        android:gravity="center"
+                        android:orientation="horizontal">
 
-                        <Spinner
-                            android:id="@+id/sp_at_tags"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/input_height"
-                            android:gravity="center"
-                            android:paddingHorizontal="10dp" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rectangle">
+
+                            <Spinner
+                                android:id="@+id/sp_at_project"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/input_height"
+                                android:paddingHorizontal="10dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/rectangle">
+
+                            <Spinner
+                                android:id="@+id/sp_at_tags"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/input_height"
+                                android:gravity="center"
+                                android:paddingHorizontal="10dp" />
+                        </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
 
-                <Button
-                    android:id="@+id/btn_at_save"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/input_top_margin"
-                    android:text="Save"
-                    app:cornerRadius="10dp" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </LinearLayout>
+                    <Button
+                        android:id="@+id/btn_at_save"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/input_top_margin"
+                        android:text="Save"
+                        app:cornerRadius="10dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>

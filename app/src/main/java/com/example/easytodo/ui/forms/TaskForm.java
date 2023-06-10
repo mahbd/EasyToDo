@@ -33,6 +33,7 @@ import io.realm.RealmResults;
 
 public class TaskForm extends Fragment {
     private FragmentTaskFormBinding binding;
+    private String EMPTY = "None";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -41,13 +42,13 @@ public class TaskForm extends Fragment {
 
         RealmResults<Project> projects = Realm.getDefaultInstance().where(Project.class).findAll();
         List<String> projectTitles = new ArrayList<>();
-        projectTitles.add("None");
+        projectTitles.add(EMPTY);
         for (Project project : projects) {
             projectTitles.add(project.getTitle());
         }
         RealmResults<Tag> tags = Realm.getDefaultInstance().where(Tag.class).findAll();
         List<String> tagTitles = new ArrayList<>();
-        tagTitles.add("None");
+        tagTitles.add(EMPTY);
         for (Tag tag : tags) {
             tagTitles.add(tag.getTitle());
         }
@@ -107,7 +108,13 @@ public class TaskForm extends Fragment {
             String date = binding.etAtDate.getText().toString();
             String time = binding.etAtTime.getText().toString();
             String project = binding.spAtProject.getSelectedItem().toString();
+            if (project.equals(EMPTY)) {
+                project = "";
+            }
             String tag = binding.spAtTags.getSelectedItem().toString();
+            if (tag.equals(EMPTY)) {
+                tag = "";
+            }
             if (!date.isEmpty() && !time.isEmpty()) {
                 deadline = date + "T" + time + ":00+06:00";
             } else if (!date.isEmpty()) {
@@ -133,16 +140,6 @@ public class TaskForm extends Fragment {
                     finalTask.setTitle(title);
                     finalTask.setDescription(description);
                     finalTask.setDeadline(dateTime);
-                    if (project.equals("None")) {
-                        finalTask.setProject("");
-                    } else {
-                        finalTask.setProject(project);
-                    }
-                    if (tag.equals("None")) {
-                        finalTask.setTag("");
-                    } else {
-                        finalTask.setTag(tag);
-                    }
                 });
                 Events.notifyTaskListeners(finalTask.getId(), ActionEnum.UPDATE);
             } else {
