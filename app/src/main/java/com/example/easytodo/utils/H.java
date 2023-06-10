@@ -21,6 +21,7 @@ import retrofit2.Response;
 
 public class H {
     public static final String BASE_URL = "https://api.re-todo.tk/api/";
+//    public static final String BASE_URL = "http://10.0.2.2:8000/api/";
     public static final String WS_URL = "wss://api.re-todo.tk/ws/core/";
     public interface SimpleAlertCallback {
         void onOk();

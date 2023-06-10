@@ -2,6 +2,7 @@ package com.example.easytodo.services;
 
 import com.example.easytodo.models.Task;
 
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -13,6 +14,9 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface TaskAPI {
+    @GET("tasks/with-me/")
+    Call<List<Task>> getTasksWithMe();
+
     @GET("tasks/{id}/")
     Call<Task> getTask(@Path("id") long id);
 

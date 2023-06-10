@@ -65,6 +65,7 @@ public class LoginActivity extends AppCompatActivity {
                     try {
                         prefs.edit().putString("access", token.get("access")).apply();
                         prefs.edit().putString("refresh", token.get("refresh")).apply();
+                        prefs.edit().putString("username", username).apply();
                         Token.access = token.get("access");
                         Token.refresh = token.get("refresh");
                         SyncHandler syncHandler = new SyncHandler(this);

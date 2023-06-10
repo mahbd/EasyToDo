@@ -1,5 +1,6 @@
 package com.example.easytodo.ui.screens;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,14 +10,18 @@ import android.widget.SimpleAdapter;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.preference.PreferenceManager;
 
 import com.example.easytodo.R;
+import com.example.easytodo.adapters.TasksAdapter;
 import com.example.easytodo.databinding.FragmentShareBinding;
 import com.example.easytodo.enums.TableEnum;
 import com.example.easytodo.models.Share;
+import com.example.easytodo.models.Task;
 import com.example.easytodo.models.User;
 import com.example.easytodo.services.GenAPIS;
 import com.example.easytodo.services.ShareAPI;
+import com.example.easytodo.services.TaskAPI;
 import com.example.easytodo.utils.H;
 
 import java.util.ArrayList;
@@ -33,8 +38,9 @@ public class ShareScreen extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentShareBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
 
-        String USER = "mah";
+        String USER = prefs.getString("username", "mah");
 
         ShareAPI shareAPI = GenAPIS.getAPI(ShareAPI.class);
         Map<String, String> query = Map.of("user__username", USER, "table", TableEnum.PROJECT.getValue());
@@ -94,6 +100,15 @@ public class ShareScreen extends Fragment {
                 }
                 SimpleAdapter adapter = getAdapter(psbData);
                 binding.tagsSharedWithMe.setAdapter(adapter);
+            }
+        });
+
+        TaskAPI taskAPI = GenAPIS.getAPI(TaskAPI.class);
+        H.enqueueReq(taskAPI.getTasksWithMe(), (call, response) -> {
+            if (response.isSuccessful() && response.body() != null) {
+                List<Task> tasks = response.body();
+                TasksAdapter adapter = new TasksAdapter(requireContext(), R.layout.task_item, tasks);
+                binding.taskList.setAdapter(adapter);
             }
         });
 
