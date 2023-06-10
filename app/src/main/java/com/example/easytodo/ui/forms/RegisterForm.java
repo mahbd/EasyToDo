@@ -1,6 +1,7 @@
 package com.example.easytodo.ui.forms;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.easytodo.LoginActivity;
 import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentRegisterFormBinding;
 import com.example.easytodo.utils.FormHandler;
@@ -66,8 +68,9 @@ public class RegisterForm extends Fragment {
                     formHandler.clearFields();
                     binding.etRegPassword2.setText("");
                     Toast.makeText(getContext(), "Registration Successful", Toast.LENGTH_LONG).show();
-                    NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_container);
-                    navController.navigate(R.id.nav_login_form);
+                    Intent intent = new Intent(getContext(), LoginActivity.class);
+                    startActivity(intent);
+                    (requireActivity()).finish();
                 } else {
                     formHandler.set400Error(response);
                 }
@@ -75,8 +78,9 @@ public class RegisterForm extends Fragment {
         });
 
         binding.btnRegLogin.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_container);
-            navController.navigate(R.id.nav_login_form);
+            Intent intent = new Intent(getContext(), LoginActivity.class);
+            startActivity(intent);
+            (requireActivity()).finish();
         });
 
         return root;

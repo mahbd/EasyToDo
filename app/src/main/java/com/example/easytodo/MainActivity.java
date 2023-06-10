@@ -1,6 +1,7 @@
 package com.example.easytodo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
+    private SharedPreferences prefs;
     private WebSocket ws;
 
     @Override
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         UserAPI userAPI = GenAPIS.getAPI(UserAPI.class, false);
         Map<String, String> body = Map.of("token", prefs.getString("access", ""));
@@ -108,10 +110,6 @@ public class MainActivity extends AppCompatActivity {
             });
             swipeRefreshLayout.setRefreshing(false);
         });
-
-        if (prefs.getString("access", "").isEmpty()) {
-            navController.navigate(R.id.nav_login_form);
-        }
     }
 
     @Override
@@ -140,11 +138,23 @@ public class MainActivity extends AppCompatActivity {
             Tag.deleteAll();
             User.deleteAll();
             Snackbar.make(binding.getRoot(), "Logged out", Snackbar.LENGTH_SHORT).show();
-            Navigation.findNavController(this, R.id.fragment_container).navigate(R.id.nav_login_form);
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         } else {
             return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (prefs.getString("access", "").isEmpty()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override

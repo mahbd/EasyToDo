@@ -2,12 +2,14 @@ package com.example.easytodo.services;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import androidx.navigation.Navigation;
 import androidx.preference.PreferenceManager;
 
+import com.example.easytodo.LoginActivity;
 import com.example.easytodo.R;
 import com.example.easytodo.utils.H;
 import com.google.gson.JsonObject;
@@ -52,7 +54,8 @@ public class Token {
                 prefs.edit().putString("refresh", "").apply();
                 Token.access = "";
                 Token.refresh = "";
-                Navigation.findNavController((Activity) context, R.id.fragment_container).navigate(R.id.nav_login_form);
+                Intent intent = new Intent(context, LoginActivity.class);
+                context.startActivity(intent);
             }
         });
     }
