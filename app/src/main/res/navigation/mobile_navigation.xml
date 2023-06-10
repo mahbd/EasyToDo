@@ -36,12 +36,6 @@
         tools:layout="@layout/fragment_share" />
 
     <fragment
-        android:id="@+id/nav_register_form"
-        android:name="com.example.easytodo.ui.forms.RegisterForm"
-        android:label="Register"
-        tools:layout="@layout/fragment_register_form" />
-
-    <fragment
         android:id="@+id/nav_task_form"
         android:name="com.example.easytodo.ui.forms.TaskForm"
         android:label="Task Form"
