@@ -2,9 +2,14 @@ package com.example.easytodo.ui.forms;
 
 import static java.lang.String.format;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +23,10 @@ import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.models.Project;
 import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.Task;
+import com.example.easytodo.utils.DateTImeExtractor;
 import com.example.easytodo.utils.Events;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +62,70 @@ public class TaskForm extends Fragment {
 
         long taskId;
         Task task = null;
+
+        binding.etAtTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int currentSelection = binding.etAtTitle.getSelectionStart();
+                binding.etAtTitle.removeTextChangedListener(this);
+                boolean detected = false;
+                if (s.length() > 0) {
+                    SpannableStringBuilder builder = new SpannableStringBuilder(s);
+                    DateTImeExtractor.ExtractedData data = DateTImeExtractor.after_matcher(s.toString());
+                    if (!data.found) {
+                        DateTImeExtractor.ExtractedData data_date, data_time;
+                        data_date = DateTImeExtractor.full_date_matcher(s.toString());
+                        if (!data_date.found) {
+                            data_date = DateTImeExtractor.half_date_matcher(s.toString());
+                        }
+                        if (data_date.found) {
+                            detected = true;
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            binding.etAtDate.setText(sdf.format(data_date.date));
+                            int start = data_date.start;
+                            int end = data_date.end;
+                            builder.setSpan(new android.text.style.ForegroundColorSpan(Color.RED), start, end, 0);
+                        }
+                        data_time = DateTImeExtractor.full_time_matcher(s.toString());
+                        if (!data_time.found) {
+                            data_time = DateTImeExtractor.half_time_matcher(s.toString());
+                        }
+                        if (data_time.found) {
+                            detected = true;
+                            binding.etAtTime.setText(data_time.time.toString());
+                            int start = data_time.start;
+                            int end = data_time.end;
+                            builder.setSpan(new android.text.style.ForegroundColorSpan(Color.RED), start, end, 0);
+                        }
+                    } else {
+                        detected = true;
+                        binding.etAtDate.setText(data.date.toString());
+                        binding.etAtTime.setText(data.time.toString());
+                        int start = data.start;
+                        int end = data.end;
+                        builder.setSpan(new android.text.style.ForegroundColorSpan(Color.RED), start, end, 0);
+                    }
+                    if (!detected) {
+                        String text = builder.toString();
+                        binding.etAtTitle.setText(text);
+                    } else {
+                        binding.etAtTitle.setText(builder);
+                    }
+                    binding.etAtTitle.setSelection(currentSelection);
+                }
+                binding.etAtTitle.addTextChangedListener(this);
+            }
+        });
 
         binding.etAtDate.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext());
