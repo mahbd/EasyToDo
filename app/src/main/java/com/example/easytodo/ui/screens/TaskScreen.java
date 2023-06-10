@@ -30,8 +30,22 @@ public class TaskScreen extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTaskBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        List<Task> tasks = Realm.getDefaultInstance().where(Task.class).equalTo("completed", false).findAll();
+        List<Task> tasks;
+        String projectTitle = null, tagTitle = null;
+        if (getArguments() != null) {
+            projectTitle = getArguments().getString("project");
+            tagTitle = getArguments().getString("tag");
+        }
+        if (projectTitle != null) {
+            binding.tasksHeading.setText("Showing tasks for project: " + projectTitle);
+            tasks = Realm.getDefaultInstance().where(Task.class).equalTo("project_title", projectTitle).findAll();
+        } else if (tagTitle != null) {
+            binding.tasksHeading.setText("Showing tasks for tag: " + tagTitle);
+            tasks = Realm.getDefaultInstance().where(Task.class).contains("tag_titles", tagTitle).findAll();
+        } else {
+            binding.tasksHeading.setText("Showing all tasks");
+            tasks = Realm.getDefaultInstance().where(Task.class).equalTo("completed", false).findAll();
+        }
         TasksAdapter adapter = new TasksAdapter(requireContext(), R.layout.task_item, tasks);
         binding.taskList.setAdapter(adapter);
 

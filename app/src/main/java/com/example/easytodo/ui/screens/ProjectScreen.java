@@ -61,6 +61,15 @@ public class ProjectScreen extends Fragment {
             return false;
         });
 
+        binding.projectList.setOnItemClickListener((parent, view, position, id) -> {
+            Bundle bundle = new Bundle();
+            Project project = projects.get(position);
+            if (project != null)
+                bundle.putString("project", project.getTitle());
+            Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                    .navigate(R.id.nav_task, bundle);
+        });
+
         projectListener = (projectId, action) -> requireActivity().recreate();
         Events.addProjectListener(projectListener);
 

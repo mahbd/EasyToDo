@@ -40,6 +40,11 @@ public class ProjectsAdapter extends ArrayAdapter<Project> {
         return projectList.get(position);
     }
 
+    @Override
+    public long getItemId(int position) {
+        return projectList.get(position).getId();
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

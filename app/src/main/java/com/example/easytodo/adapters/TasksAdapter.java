@@ -41,6 +41,11 @@ public class TasksAdapter extends ArrayAdapter<Task> {
         return taskList.get(position);
     }
 
+    @Override
+    public long getItemId(int position) {
+        return taskList.get(position).getId();
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

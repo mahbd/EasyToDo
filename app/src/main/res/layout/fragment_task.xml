@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.screens.TaskScreen">
 
+    <TextView
+        android:id="@+id/tasks_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_new_task" />
 
     <ListView
         android:id="@+id/task_list"
@@ -17,7 +24,7 @@
         android:dividerHeight="10dp"
         android:listSelector="@android:color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_new_task"
+        app:layout_constraintTop_toBottomOf="@+id/tasks_heading"
         tools:listitem="@layout/task_item" />
 
     <Button

@@ -65,6 +65,16 @@ public class TagScreen extends Fragment {
             return false;
         });
 
+        binding.tagList.setOnItemClickListener((parent, view, position, id) -> {
+            Tag tag = tags.get(position);
+            if (tag != null) {
+                Bundle bundle = new Bundle();
+                bundle.putString("tag", tag.getTitle());
+                Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                        .navigate(R.id.nav_task, bundle);
+            }
+        });
+
         tagListener = (tagId, action) -> requireActivity().recreate();
         Events.addTagListener(tagListener);
 
