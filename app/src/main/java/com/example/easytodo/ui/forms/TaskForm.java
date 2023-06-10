@@ -23,7 +23,7 @@ import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.models.Project;
 import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.Task;
-import com.example.easytodo.utils.DateTImeExtractor;
+import com.example.easytodo.utils.DateTimeExtractor;
 import com.example.easytodo.utils.Events;
 
 import java.text.SimpleDateFormat;
@@ -81,31 +81,33 @@ public class TaskForm extends Fragment {
                 boolean detected = false;
                 if (s.length() > 0) {
                     SpannableStringBuilder builder = new SpannableStringBuilder(s);
-                    DateTImeExtractor.ExtractedData data = DateTImeExtractor.after_matcher(s.toString());
+                    DateTimeExtractor.ExtractedData data = DateTimeExtractor.after_matcher(s.toString());
                     if (!data.found) {
-                        DateTImeExtractor.ExtractedData data_date, data_time;
-                        data_date = DateTImeExtractor.full_date_matcher(s.toString());
+                        DateTimeExtractor.ExtractedData data_date, data_time;
+                        data_date = DateTimeExtractor.full_date_matcher(s.toString());
                         if (!data_date.found) {
-                            data_date = DateTImeExtractor.half_date_matcher(s.toString());
+                            data_date = DateTimeExtractor.half_date_matcher(s.toString());
                         }
                         if (data_date.found) {
                             detected = true;
-                            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            binding.etAtDate.setText(sdf.format(data_date.date));
+                            binding.etAtDate.setText(data_date.date);
                             int start = data_date.start;
                             int end = data_date.end;
                             builder.setSpan(new android.text.style.ForegroundColorSpan(Color.RED), start, end, 0);
                         }
-                        data_time = DateTImeExtractor.full_time_matcher(s.toString());
+                        data_time = DateTimeExtractor.full_time_matcher(s.toString());
                         if (!data_time.found) {
-                            data_time = DateTImeExtractor.half_time_matcher(s.toString());
+                            data_time = DateTimeExtractor.half_time_matcher(s.toString());
                         }
                         if (data_time.found) {
                             detected = true;
-                            binding.etAtTime.setText(data_time.time.toString());
+                            binding.etAtTime.setText(data_time.time);
                             int start = data_time.start;
                             int end = data_time.end;
                             builder.setSpan(new android.text.style.ForegroundColorSpan(Color.RED), start, end, 0);
+                        }
+                        if (data_time.found && !data_date.found) {
+                            binding.etAtDate.setText(data_time.date);
                         }
                     } else {
                         detected = true;

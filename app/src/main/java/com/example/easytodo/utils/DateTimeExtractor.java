@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DateTImeExtractor {
+public class DateTimeExtractor {
     public static class ExtractedData {
         public String date;
         public String time;
