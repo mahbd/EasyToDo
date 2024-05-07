@@ -13,27 +13,25 @@ import androidx.navigation.Navigation;
 
 import com.example.easytodo.R;
 import com.example.easytodo.databinding.FragmentTagBinding;
-import com.example.easytodo.models.Sync;
+import com.example.easytodo.models.DB;
 import com.example.easytodo.models.Tag;
-import com.example.easytodo.utils.Events;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
+import java.util.List;
 
 
 public class TagScreen extends Fragment {
     private FragmentTagBinding binding;
-    Events.TagListener tagListener;
+    DB.TagListener tagListener;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTagBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        RealmResults<Tag> tags = Realm.getDefaultInstance().where(Tag.class).findAll();
+        List<Tag> tags = DB.tags;
         String[] tagNames = new String[tags.size()];
         for (Tag tag : tags) {
-            tagNames[tags.indexOf(tag)] = tag.getTitle();
+            tagNames[tags.indexOf(tag)] = tag.title;
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, tagNames);
@@ -49,13 +47,13 @@ public class TagScreen extends Fragment {
                     Tag tag = tags.get(position);
                     Bundle bundle = new Bundle();
                     if (tag != null)
-                        bundle.putLong("tag", tag.getId());
+                        bundle.putString("tag", tag.id);
                     Navigation.findNavController(requireActivity(), R.id.fragment_container)
                             .navigate(R.id.nav_tag_form, bundle);
                 } else if (item.getItemId() == R.id.item_delete) {
                     Tag tag = tags.get(position);
                     if (tag != null) {
-                        Tag.delete(tag.getId());
+                        DB.deleteTag(tag);
                     }
                 }
                 return true;
@@ -68,21 +66,21 @@ public class TagScreen extends Fragment {
             Tag tag = tags.get(position);
             if (tag != null) {
                 Bundle bundle = new Bundle();
-                bundle.putString("tag", tag.getTitle());
+                bundle.putString("tag", tag.title);
                 Navigation.findNavController(requireActivity(), R.id.fragment_container)
                         .navigate(R.id.nav_task, bundle);
             }
         });
 
-        tagListener = (tagId, action) -> requireActivity().recreate();
-        Events.addTagListener(tagListener);
+        tagListener = () -> requireActivity().recreate();
+        DB.addTagListener(tagListener);
 
         return root;
     }
 
     @Override
     public void onDestroyView() {
-        Events.removeTagListener(tagListener);
+        DB.removeTagListener(tagListener);
         super.onDestroyView();
         binding = null;
     }

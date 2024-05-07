@@ -2,7 +2,6 @@ package com.example.easytodo;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,35 +15,21 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.preference.PreferenceManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.easytodo.databinding.ActivityMainBinding;
-import com.example.easytodo.models.Project;
-import com.example.easytodo.models.Sync;
-import com.example.easytodo.models.Tag;
-import com.example.easytodo.models.Task;
-import com.example.easytodo.models.User;
-import com.example.easytodo.services.GenAPIS;
-import com.example.easytodo.services.Token;
-import com.example.easytodo.services.UserAPI;
-import com.example.easytodo.utils.H;
-import com.example.easytodo.utils.SyncHandler;
+import com.example.easytodo.models.DB;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.firebase.FirebaseApp;
 
-import java.util.Map;
-
-import okhttp3.WebSocket;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
-    private SharedPreferences prefs;
-    private WebSocket ws;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,31 +37,17 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        UserAPI userAPI = GenAPIS.getAPI(UserAPI.class, false);
-        Map<String, String> body = Map.of("token", prefs.getString("access", ""));
-        H.enqueueReq(userAPI.verifyToken(body), (call, response) -> {
-            if (response.code() == 401) {
-                Token.refreshToken(this);
-            } else {
-                if (response.code() == 400 && response.errorBody() != null) {
-                    try {
-                        JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
-                        System.out.println(error);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                System.out.println("Token is valid");
-            }
-        });
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
-        ws = H.createWebSocket(prefs.getString("access", ""), text -> {
-            SyncHandler syncHandler = new SyncHandler(this);
-            syncHandler.fetch();
-            return true;
-        });
+        if (!DB.initialized) {
+            DB.init();
+        }
 
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.fab.setOnClickListener(v -> Navigation.findNavController(this,
@@ -93,23 +64,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.fragment_container);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-
-        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.refreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            swipeRefreshLayout.setRefreshing(true);
-            SyncHandler syncHandler = new SyncHandler(this);
-            syncHandler.fetch();
-            try {
-                ws.close(1000, "Refresh connection");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ws = H.createWebSocket(prefs.getString("access", ""), text -> {
-                syncHandler.sync();
-                return true;
-            });
-            swipeRefreshLayout.setRefreshing(false);
-        });
     }
 
     @Override
@@ -128,15 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_logout) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            prefs.edit().remove("access").apply();
-            prefs.edit().remove("refresh").apply();
-            prefs.edit().remove("last_sync").apply();
-            Sync.deleteAll();
-            Task.deleteAll();
-            Project.deleteAll();
-            Tag.deleteAll();
-            User.deleteAll();
+            GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut();
             Snackbar.make(binding.getRoot(), "Logged out", Snackbar.LENGTH_SHORT).show();
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
@@ -148,18 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        if (prefs.getString("access", "").isEmpty()) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        }
-    }
-
-    @Override
     protected void onDestroy() {
-        ws.close(1000, "Activity destroyed");
         super.onDestroy();
     }
 }

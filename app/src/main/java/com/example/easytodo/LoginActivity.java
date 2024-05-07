@@ -1,87 +1,72 @@
 package com.example.easytodo;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
+import static android.content.ContentValues.TAG;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.View;
 
-import com.example.easytodo.databinding.ActivityLoginBinding;
-import com.example.easytodo.services.GenAPIS;
-import com.example.easytodo.services.Token;
-import com.example.easytodo.services.UserAPI;
-import com.example.easytodo.utils.H;
-import com.example.easytodo.utils.SyncHandler;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Map;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 
-import retrofit2.Call;
 
 public class LoginActivity extends AppCompatActivity {
-    private SharedPreferences prefs;
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        Button btnLogin = findViewById(R.id.btn_login);
-        Button btnRegister = findViewById(R.id.btn_register);
-        EditText etUsername = findViewById(R.id.et_username);
-        EditText etPassword = findViewById(R.id.et_password);
-
-
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
 
-        btnRegister.setOnClickListener(v -> {
-            Intent intent = new Intent(this, RegisterActivity.class);
-            startActivity(intent);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        findViewById(R.id.google_sign_in_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
         });
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
 
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            if (account != null) {
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+            } else {
+                Log.w(TAG, "signInResult:failed code=" + completedTask.getException());
+            }
 
-        btnLogin.setOnClickListener(v -> {
-            String username = etUsername.getText().toString();
-            String password = etPassword.getText().toString();
-
-            UserAPI userAPI = GenAPIS.getAPI(UserAPI.class, false);
-            Map<String, String> body = Map.of("username", username, "password", password);
-            Call<Map<String, String>> tokenCall = userAPI.getToken(body);
-            H.enqueueReq(tokenCall, (call, response) -> {
-                if (response.isSuccessful() && response.body() != null) {
-                    Toast.makeText(this, "Login Successful", Toast.LENGTH_LONG).show();
-                    Map<String, String> token = response.body();
-                    try {
-                        prefs.edit().putString("access", token.get("access")).apply();
-                        prefs.edit().putString("refresh", token.get("refresh")).apply();
-                        prefs.edit().putString("username", username).apply();
-                        Token.access = token.get("access");
-                        Token.refresh = token.get("refresh");
-                        SyncHandler syncHandler = new SyncHandler(this);
-                        syncHandler.sync();
-
-                        Intent intent = new Intent(this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    etPassword.setError("Invalid Credentials");
-                    Toast.makeText(this, "Login Failed", Toast.LENGTH_LONG).show();
-                }
-            });
-        });
+        } catch (ApiException e) {
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+        }
     }
 }

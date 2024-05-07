@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.easytodo.R;
+import com.example.easytodo.models.DB;
+import com.example.easytodo.models.Project;
+import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.Task;
 
 import java.util.List;
@@ -41,11 +44,6 @@ public class TasksAdapter extends ArrayAdapter<Task> {
         return taskList.get(position);
     }
 
-    @Override
-    public long getItemId(int position) {
-        return taskList.get(position).getId();
-    }
-
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -64,12 +62,25 @@ public class TasksAdapter extends ArrayAdapter<Task> {
         if (task == null) {
             return row;
         }
-        holder.titleView.setText(task.getTitle());
-        if (task.getDescription().isEmpty()) {
+        Project project = DB.getProject(task.project);
+        StringBuilder tagsStrBuilder = new StringBuilder();
+        if (task.tags == null) {
+            task.tags = List.of();
+        }
+        for (String tagId : task.tags) {
+            Tag tag = DB.getTag(tagId);
+            if (tag != null) {
+                tagsStrBuilder.append(tag.title).append(", ");
+            }
+        }
+        String tagsStr = tagsStrBuilder.toString();
+
+        holder.titleView.setText(task.title);
+        if (task.description.isEmpty()) {
             holder.descriptionView.setVisibility(View.GONE);
         } else {
             holder.descriptionView.setVisibility(View.VISIBLE);
-            holder.descriptionView.setText(task.getDescription());
+            holder.descriptionView.setText(task.description);
         }
         if (task.getDeadlineStr().isEmpty()) {
             holder.dateTimeView.setVisibility(View.GONE);
@@ -77,23 +88,23 @@ public class TasksAdapter extends ArrayAdapter<Task> {
             holder.dateTimeView.setVisibility(View.VISIBLE);
             holder.dateTimeView.setText(task.getDeadlineStr());
         }
-        if (task.getReminder() == 0) {
+        if (task.reminder == 0) {
             holder.alarmView.setVisibility(View.GONE);
         } else {
             holder.alarmView.setVisibility(View.VISIBLE);
-            holder.alarmView.setText(task.getReminder());
+            holder.alarmView.setText(task.reminder);
         }
-        if (task.getProject_title().isEmpty()) {
+        if (project == null || project.title.isEmpty()) {
             holder.projectView.setVisibility(View.GONE);
         } else {
             holder.projectView.setVisibility(View.VISIBLE);
-            holder.projectView.setText(task.getProject_title());
+            holder.projectView.setText(project.title);
         }
-        if (task.getTagsString().isEmpty()) {
+        if (tagsStr.isEmpty()) {
             holder.tagView.setVisibility(View.GONE);
         } else {
             holder.tagView.setVisibility(View.VISIBLE);
-            holder.tagView.setText(task.getTagsString());
+            holder.tagView.setText(tagsStr);
         }
 
         return row;

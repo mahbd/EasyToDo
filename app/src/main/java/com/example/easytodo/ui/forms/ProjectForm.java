@@ -13,16 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.easytodo.databinding.FragmentProjectFormBinding;
-import com.example.easytodo.enums.ActionEnum;
+import com.example.easytodo.models.DB;
 import com.example.easytodo.models.Project;
-import com.example.easytodo.utils.Events;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-
-import io.realm.Realm;
 
 
 public class ProjectForm extends Fragment {
@@ -33,15 +30,15 @@ public class ProjectForm extends Fragment {
         binding = FragmentProjectFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        long projectId;
+        String projectId;
         Project project = null;
         if (getArguments() != null) {
-            projectId = getArguments().getLong("project");
-            project = Realm.getDefaultInstance().where(Project.class).equalTo("id", projectId).findFirst();
+            projectId = getArguments().getString("project");
+            project = DB.getProject(projectId);
             if (project != null) {
-                binding.etApTitle.setText(project.getTitle());
-                binding.etApDescription.setText(project.getDescription());
-                OffsetDateTime deadline = project.getDeadline();
+                binding.etApTitle.setText(project.title);
+                binding.etApDescription.setText(project.description);
+                OffsetDateTime deadline = OffsetDateTime.parse(project.deadline);
                 if (deadline != null) {
                     LocalDateTime localDateTime = deadline.toLocalDateTime();
                     binding.etApDate.setText(localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
@@ -93,22 +90,23 @@ public class ProjectForm extends Fragment {
                 binding.etApTitle.setError("Title is required");
                 return;
             }
-            if ((finalProject == null && Project.exists(title)) || (finalProject != null && Project.exists(title) && !finalProject.getTitle().equals(title))) {
+            if ((finalProject == null && DB.projectExists(title)) || (finalProject != null && DB.projectExists(title) && !finalProject.title.equals(title))) {
                 binding.etApTitle.setError("Title already exists");
                 return;
             }
             binding.etApTitle.setError(null);
 
             if (finalProject != null) {
-                Realm.getDefaultInstance().executeTransaction(realm -> {
-                    finalProject.setTitle(title);
-                    finalProject.setDescription(description);
-                    finalProject.setDeadline(dateTime);
-                });
-                Events.notifyProjectListeners(finalProject.getId(), ActionEnum.UPDATE);
+                finalProject.title = title;
+                finalProject.description = description;
+                finalProject.deadline = dateTime.toString();
+                DB.updateProject(finalProject);
             } else {
-                Project newProject = new Project(title, description, dateTime);
-                newProject.save();
+                Project newProject = new Project();
+                newProject.title = title;
+                newProject.description = description;
+                newProject.deadline = dateTime.toString();
+                DB.addProject(newProject);
             }
             requireActivity().onBackPressed();
         });

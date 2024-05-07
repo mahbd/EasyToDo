@@ -2,6 +2,7 @@ package com.example.easytodo.ui.forms;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -19,23 +20,21 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.easytodo.LoginActivity;
 import com.example.easytodo.databinding.FragmentShareFormBinding;
 import com.example.easytodo.enums.TableEnum;
+import com.example.easytodo.models.DB;
+import com.example.easytodo.models.Project;
+import com.example.easytodo.models.Share;
 import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.User;
-import com.example.easytodo.services.GenAPIS;
-import com.example.easytodo.services.ShareAPI;
-import com.example.easytodo.services.UserAPI;
 import com.example.easytodo.utils.H;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import io.realm.Realm;
 
 
 public class ShareForm extends Fragment {
@@ -45,52 +44,58 @@ public class ShareForm extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentShareFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(requireContext());
+        if (account == null) {
+            Intent intent = new Intent(requireContext(), LoginActivity.class);
+            startActivity(intent);
+            return root;
+        }
+
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
             ConnectivityManager connectivityManager = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             Network network = connectivityManager.getActiveNetwork();
             if (network != null) {
                 NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
                 if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                    Map<String, Long> userMap = new HashMap<>();
 
 
-                    List<String> usernames = new ArrayList<>();
-                    for (User user : Realm.getDefaultInstance().where(User.class).findAll()) {
-                        usernames.add(user.getUsername());
-                        userMap.put(user.getUsername(), user.getId());
+                    List<String> userEmails = new ArrayList<>();
+                    for (User user : DB.users) {
+                        userEmails.add(user.email);
                     }
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, usernames);
-                    binding.spinnerUsername.setAdapter(adapter);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, userEmails);
+                    binding.spinnerUserEmail.setAdapter(adapter);
 
 
                     List<String> itemTypes = new ArrayList<>();
                     itemTypes.add(TableEnum.TAG.getValue());
                     itemTypes.add(TableEnum.PROJECT.getValue());
-                    ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, itemTypes);
+                    ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, itemTypes);
                     binding.spinnerType.setAdapter(typeAdapter);
 
                     List<String> tags = new ArrayList<>();
-                    for (Tag tag : Realm.getDefaultInstance().where(Tag.class).findAll()) {
-                        tags.add(tag.getTitle());
+                    for (Tag tag : DB.tags) {
+                        tags.add(tag.title);
                     }
-                    ArrayAdapter<String> tagAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, tags);
-                    binding.spinnerItem.setAdapter(tagAdapter);
+                    ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, tags);
+                    binding.spinnerItem.setAdapter(dataAdapter);
 
                     binding.spinnerType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            tagAdapter.clear();
+                            dataAdapter.clear();
                             if (position == 0) {
-                                for (Tag tag : Realm.getDefaultInstance().where(Tag.class).findAll()) {
-                                    tagAdapter.add(tag.getTitle());
+                                for (Tag tag : DB.tags) {
+                                    dataAdapter.add(tag.title);
                                 }
                             } else {
-                                for (com.example.easytodo.models.Project project : Realm.getDefaultInstance().where(com.example.easytodo.models.Project.class).findAll()) {
-                                    tagAdapter.add(project.getTitle());
+                                for (Project project : DB.projects) {
+                                    dataAdapter.add(project.title);
                                 }
                             }
-                            tagAdapter.notifyDataSetChanged();
+                            dataAdapter.notifyDataSetChanged();
                         }
 
                         @Override
@@ -100,43 +105,41 @@ public class ShareForm extends Fragment {
                     });
 
                     binding.btnShare.setOnClickListener(v -> {
-                        String username = binding.spinnerUsername.getSelectedItem().toString();
+                        String userEmail = binding.spinnerUserEmail.getSelectedItem().toString();
                         String itemType = binding.spinnerType.getSelectedItem().toString();
                         String item = binding.spinnerItem.getSelectedItem().toString();
 
-                        long userId = userMap.get(username);
-                        long itemId;
+                        String itemId;
                         if (itemType.equals(TableEnum.TAG.getValue())) {
-                            itemId = Realm.getDefaultInstance().where(Tag.class).equalTo("title", item).findFirst().getId();
+                            Tag tag = DB.getTagByTitle(item);
+                            if (tag == null) {
+                                Toast.makeText(getContext(), "Invalid tag", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            itemId = tag.id;
                         } else {
-                            itemId = Realm.getDefaultInstance().where(com.example.easytodo.models.Project.class).equalTo("title", item).findFirst().getId();
+                            Project project = DB.getProjectByTitle(item);
+                            if (project == null) {
+                                Toast.makeText(getContext(), "Invalid project", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            itemId = project.id;
                         }
 
-                        if (userId == 0 || itemId >= 1000_000_000) {
+                        if (userEmail.isEmpty()) {
                             Toast.makeText(getContext(), "Invalid user or item", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        Map<String, Object> body = new HashMap<>();
-                        body.put("shared_with", userId);
-                        body.put("table", itemType);
-                        body.put("data_id", itemId);
-                        ShareAPI shareAPI = GenAPIS.getAPI(ShareAPI.class);
-                        H.enqueueReq(shareAPI.createShare(body), (call, response) -> {
-                            if (response.isSuccessful()) {
-                                Toast.makeText(getContext(), "Item shared", Toast.LENGTH_SHORT).show();
-                                requireActivity().onBackPressed();
-                            } else {
-                                if (response.code() == 400 && response.errorBody() != null) {
-                                    try {
-                                        JsonObject error = new JsonParser().parse(response.errorBody().string()).getAsJsonObject();
-                                        System.out.println(error);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                Toast.makeText(getContext(), "Item not shared", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+
+                        Share newShare = new Share();
+                        newShare.shared_with = userEmail;
+                        newShare.table = itemType;
+                        newShare.data_id = itemId;
+                        newShare.shared_by = account.getEmail();
+
+                        DB.addShare(newShare);
+                        Toast.makeText(getContext(), "Item shared", Toast.LENGTH_SHORT).show();
+                        requireActivity().onBackPressed();
                     });
                 }
                 return root;

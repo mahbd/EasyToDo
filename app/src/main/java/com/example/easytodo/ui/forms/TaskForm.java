@@ -2,7 +2,6 @@ package com.example.easytodo.ui.forms;
 
 import static java.lang.String.format;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.graphics.Color;
@@ -19,14 +18,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.easytodo.databinding.FragmentTaskFormBinding;
-import com.example.easytodo.enums.ActionEnum;
+import com.example.easytodo.models.DB;
 import com.example.easytodo.models.Project;
 import com.example.easytodo.models.Tag;
 import com.example.easytodo.models.Task;
 import com.example.easytodo.utils.DateTimeExtractor;
-import com.example.easytodo.utils.Events;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,34 +31,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
-
 
 public class TaskForm extends Fragment {
     private FragmentTaskFormBinding binding;
-    private String EMPTY = "None";
+    private final String EMPTY = "None";
+    DB.TaskListener taskListener;
+    DB.ProjectListener projectListener;
+    DB.TagListener tagListener;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentTaskFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        RealmResults<Project> projects = Realm.getDefaultInstance().where(Project.class).findAll();
+        List<Project> projects = DB.projects;
+        List<Tag> tags = DB.tags;
+
         List<String> projectTitles = new ArrayList<>();
         projectTitles.add(EMPTY);
         for (Project project : projects) {
-            projectTitles.add(project.getTitle());
+            projectTitles.add(project.title);
         }
-        RealmResults<Tag> tags = Realm.getDefaultInstance().where(Tag.class).findAll();
         List<String> tagTitles = new ArrayList<>();
         tagTitles.add(EMPTY);
         for (Tag tag : tags) {
-            tagTitles.add(tag.getTitle());
+            tagTitles.add(tag.title);
         }
 
-        long taskId;
-        Task task = null;
+        String taskId;
 
         binding.etAtTitle.addTextChangedListener(new TextWatcher() {
             @Override
@@ -111,8 +108,8 @@ public class TaskForm extends Fragment {
                         }
                     } else {
                         detected = true;
-                        binding.etAtDate.setText(data.date.toString());
-                        binding.etAtTime.setText(data.time.toString());
+                        binding.etAtDate.setText(data.date);
+                        binding.etAtTime.setText(data.time);
                         int start = data.start;
                         int end = data.end;
                         builder.setSpan(new android.text.style.ForegroundColorSpan(Color.RED), start, end, 0);
@@ -153,29 +150,43 @@ public class TaskForm extends Fragment {
         ArrayAdapter<String> tagAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, tagTitles);
         binding.spAtTags.setAdapter(tagAdapter);
 
+
         if (getArguments() != null) {
-            taskId = getArguments().getLong("task");
-            task = Realm.getDefaultInstance().where(Task.class).equalTo("id", taskId).findFirst();
+            taskId = getArguments().getString("task");
+            Task task = DB.getTask(taskId);
             if (task != null) {
-                binding.etAtTitle.setText(task.getTitle());
-                binding.etAtDescription.setText(task.getDescription());
-                OffsetDateTime deadline = task.getDeadline();
-                if (deadline != null) {
-                    LocalDateTime localDateTime = deadline.toLocalDateTime();
-                    binding.etAtDate.setText(localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-                    binding.etAtTime.setText(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+                Project project = DB.getProject(task.project);
+                StringBuilder taskTagsStringBuilder = new StringBuilder();
+                for (String tagId : task.tags) {
+                    Tag tag = DB.getTag(tagId);
+                    if (tag != null) {
+                        taskTagsStringBuilder.append(tag.title).append(", ");
+                    }
                 }
-                if (!task.getProject_title().isEmpty() && projectTitles.contains(task.getProject_title())) {
-                    binding.spAtProject.setSelection(projectTitles.indexOf(task.getProject_title()));
+                String taskTags = taskTagsStringBuilder.toString();
+                if (project != null) {
+                    binding.etAtTitle.setText(task.title);
+                    binding.etAtDescription.setText(task.description);
+                    OffsetDateTime deadline = OffsetDateTime.parse(task.deadline);
+                    if (deadline != null) {
+                        LocalDateTime localDateTime = deadline.toLocalDateTime();
+                        binding.etAtDate.setText(localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                        binding.etAtTime.setText(localDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+                    }
+                    if (!project.title.isEmpty() && projectTitles.contains(project.title)) {
+                        binding.spAtProject.setSelection(projectTitles.indexOf(project.title));
+                    }
+                    if (!taskTags.isEmpty() && tagTitles.contains(taskTags)) {
+                        binding.spAtTags.setSelection(tagTitles.indexOf(taskTags));
+                    }
+                    binding.btnAtSave.setText("Update Task");
                 }
-                if (!task.getTagsString().isEmpty() && tagTitles.contains(task.getTagsString())) {
-                    binding.spAtTags.setSelection(tagTitles.indexOf(task.getTagsString()));
-                }
-                binding.btnAtSave.setText("Update Task");
+
             }
+        } else {
+            taskId = null;
         }
 
-        Task finalTask = task;
         binding.btnAtSave.setOnClickListener(v -> {
             String deadline;
             String date = binding.etAtDate.getText().toString();
@@ -208,19 +219,59 @@ public class TaskForm extends Fragment {
             }
             binding.etAtTitle.setError(null);
 
-            if (finalTask != null) {
-                Realm.getDefaultInstance().executeTransaction(realm -> {
-                    finalTask.setTitle(title);
-                    finalTask.setDescription(description);
-                    finalTask.setDeadline(dateTime);
-                });
-                Events.notifyTaskListeners(finalTask.getId(), ActionEnum.UPDATE);
+            if (taskId != null) {
+                Task task = DB.getTask(taskId);
+                assert task != null;
+                task.title = title;
+                task.description = description;
+                task.deadline = dateTime.toString();
+                DB.updateTask(task);
             } else {
-                Task newTask = new Task(title, description, dateTime, project, tag);
-                newTask.save();
+                Task newTask = new Task();
+                newTask.title = title;
+                newTask.description = description;
+                newTask.deadline = deadline.toString();
+                if (!project.isEmpty()) {
+                    Project selectedProject = DB.getProjectByTitle(project);
+                    if (selectedProject != null)
+                        newTask.project = selectedProject.id;
+                }
+                if (!tag.isEmpty()) {
+                    Tag selectedTag = DB.getTagByTitle(tag);
+                    if (selectedTag != null) {
+                        newTask.tags = new ArrayList<>();
+                        newTask.tags.add(selectedTag.id);
+                    }
+                }
+                DB.addTask(newTask);
             }
             requireActivity().onBackPressed();
         });
+
+        taskListener = new DB.TaskListener() {
+            @Override
+            public void onTaskChanged() {
+                requireActivity().onBackPressed();
+            }
+        };
+
+        projectListener = new DB.ProjectListener() {
+            @Override
+            public void onProjectChanged() {
+                requireActivity().onBackPressed();
+            }
+        };
+
+        tagListener = new DB.TagListener() {
+            @Override
+            public void onTagChanged() {
+                requireActivity().onBackPressed();
+            }
+        };
+
+        DB.addTaskListener(taskListener);
+        DB.addProjectListener(projectListener);
+        DB.addTagListener(tagListener);
 
         return root;
     }
@@ -229,5 +280,8 @@ public class TaskForm extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        DB.removeTaskListener(taskListener);
+        DB.removeProjectListener(projectListener);
+        DB.removeTagListener(tagListener);
     }
 }

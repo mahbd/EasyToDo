@@ -9,11 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.easytodo.databinding.FragmentTagFormBinding;
-import com.example.easytodo.enums.ActionEnum;
+import com.example.easytodo.models.DB;
 import com.example.easytodo.models.Tag;
-import com.example.easytodo.utils.Events;
-
-import io.realm.Realm;
 
 
 public class TagForm extends Fragment {
@@ -24,13 +21,13 @@ public class TagForm extends Fragment {
         binding = FragmentTagFormBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        long tagId;
+        String tagId;
         Tag tag = null;
         if (getArguments() != null) {
-            tagId = getArguments().getLong("tag");
-            tag = Realm.getDefaultInstance().where(Tag.class).equalTo("id", tagId).findFirst();
+            tagId = getArguments().getString("tag");
+            tag = DB.getTag(tagId);
             if (tag != null) {
-                binding.etAtTitle.setText(tag.getTitle());
+                binding.etAtTitle.setText(tag.title);
                 binding.btnAtSave.setText("Update Tag");
             }
         }
@@ -39,18 +36,18 @@ public class TagForm extends Fragment {
         binding.btnAtSave.setOnClickListener(v -> {
             String title = binding.etAtTitle.getText().toString();
 
-            if (Tag.exists(title)) {
+            if (DB.tagExists(title)) {
                 binding.etAtTitle.setError("Tag already exists");
                 return;
             }
             binding.etAtTitle.setError(null);
             if (finalTag != null) {
-                finalTag.setTitle(title);
-                Events.notifyTagListeners(finalTag.getId(), ActionEnum.UPDATE);
+                finalTag.title = title;
+                DB.updateTag(finalTag);
             } else {
-                Tag newTag = new Tag(title);
-                newTag.save();
-                Events.notifyTagListeners(newTag.getId(), ActionEnum.CREATE);
+                Tag newTag = new Tag();
+                newTag.title = title;
+                DB.addTag(newTag);
             }
 
             requireActivity().onBackPressed();

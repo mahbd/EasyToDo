@@ -40,11 +40,6 @@ public class ProjectsAdapter extends ArrayAdapter<Project> {
         return projectList.get(position);
     }
 
-    @Override
-    public long getItemId(int position) {
-        return projectList.get(position).getId();
-    }
-
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -63,12 +58,12 @@ public class ProjectsAdapter extends ArrayAdapter<Project> {
         if (project == null) {
             return row;
         }
-        holder.titleView.setText(project.getTitle());
-        if (project.getDescription().isEmpty()) {
+        holder.titleView.setText(project.title);
+        if (project.description.isEmpty()) {
             holder.descriptionView.setVisibility(View.GONE);
         } else {
             holder.descriptionView.setVisibility(View.VISIBLE);
-            holder.descriptionView.setText(project.getDescription());
+            holder.descriptionView.setText(project.description);
         }
         if (project.getDeadlineStr().isEmpty()) {
             holder.dateTimeView.setVisibility(View.GONE);

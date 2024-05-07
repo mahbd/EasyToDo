@@ -1,6 +1,7 @@
 package com.example.easytodo.ui.screens;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +12,19 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.easytodo.R;
+import com.example.easytodo.models.DB;
 import com.example.easytodo.adapters.TasksAdapter;
 import com.example.easytodo.databinding.FragmentHomeBinding;
-import com.example.easytodo.enums.ActionEnum;
 import com.example.easytodo.models.Task;
-import com.example.easytodo.utils.Events;
 
 import java.util.List;
-
-import io.realm.Realm;
-import io.realm.Sort;
 
 
 public class HomeScreen extends Fragment {
     private FragmentHomeBinding binding;
-    Events.TaskListener taskListener;
+    DB.TaskListener taskListener;
+    DB.ProjectListener projectListener;
+    DB.TagListener tagListener;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -33,7 +32,9 @@ public class HomeScreen extends Fragment {
         View root = binding.getRoot();
 
 
-        List<Task> tasks = Realm.getDefaultInstance().where(Task.class).equalTo("completed", false).findAll().sort("deadline", Sort.ASCENDING);
+        Log.d("HomeScreen", "Rendering");
+
+        List<Task> tasks = DB.completedTasks();
         TasksAdapter adapter = new TasksAdapter(requireContext(), R.layout.task_item, tasks);
         binding.taskList.setAdapter(adapter);
         binding.taskList.setOnItemLongClickListener((parent, view, position, id) -> {
@@ -43,25 +44,21 @@ public class HomeScreen extends Fragment {
                 if (item.getItemId() == R.id.item_complete) {
                     Task task = tasks.get(position);
                     if (task != null) {
-                        Realm.getDefaultInstance().executeTransaction(realm -> {
-                            task.setCompleted(true);
-                        });
-                        requireActivity().recreate();
-                        Events.notifyTaskListeners(task.getId(), ActionEnum.UPDATE);
+                        task.completed = true;
+                        DB.updateTask(task);
                     }
                 } else if (item.getItemId() == R.id.item_edit) {
                     Task task = tasks.get(position);
                     Bundle bundle = new Bundle();
                     if (task != null)
-                        bundle.putLong("task", task.getId());
+                        bundle.putString("task", task.id);
                     Navigation.findNavController(requireActivity(), R.id.fragment_container)
                             .navigate(R.id.nav_task_form, bundle);
                 } else if (item.getItemId() == R.id.item_delete) {
                     Task task = tasks.get(position);
                     if (task != null) {
-                        Task.delete(task.getId());
+                        DB.deleteTask(task);
                     }
-                    requireActivity().recreate();
                 }
                 return true;
             });
@@ -69,16 +66,22 @@ public class HomeScreen extends Fragment {
             return false;
         });
 
-        taskListener = (taskId, action) -> requireActivity().recreate();
-        Events.addTaskListener(taskListener);
+        taskListener = () -> requireActivity().recreate();
+        projectListener = () -> requireActivity().recreate();
+        tagListener = () -> requireActivity().recreate();
+        DB.addTaskListener(taskListener);
+        DB.addProjectListener(projectListener);
+        DB.addTagListener(tagListener);
 
         return root;
     }
 
     @Override
     public void onDestroyView() {
-        Events.removeTaskListener(taskListener);
         super.onDestroyView();
         binding = null;
+        DB.removeTaskListener(taskListener);
+        DB.removeProjectListener(projectListener);
+        DB.removeTagListener(tagListener);
     }
 }

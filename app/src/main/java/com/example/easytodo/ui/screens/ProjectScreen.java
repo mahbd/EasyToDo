@@ -13,25 +13,23 @@ import androidx.navigation.Navigation;
 import com.example.easytodo.R;
 import com.example.easytodo.adapters.ProjectsAdapter;
 import com.example.easytodo.databinding.FragmentProjectBinding;
-import com.example.easytodo.enums.ActionEnum;
+import com.example.easytodo.models.DB;
 import com.example.easytodo.models.Project;
-import com.example.easytodo.utils.Events;
 
 import java.util.List;
 
-import io.realm.Realm;
 
 
 public class ProjectScreen extends Fragment {
     private FragmentProjectBinding binding;
-    Events.ProjectListener projectListener;
+    DB.ProjectListener projectListener;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentProjectBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        List<Project> projects = Realm.getDefaultInstance().where(Project.class).findAll();
+        List<Project> projects = DB.projects;
         ProjectsAdapter adapter = new ProjectsAdapter(getContext(), R.id.project_list, projects);
         binding.projectList.setAdapter(adapter);
 
@@ -45,13 +43,13 @@ public class ProjectScreen extends Fragment {
                     Project project = projects.get(position);
                     Bundle bundle = new Bundle();
                     if (project != null)
-                        bundle.putLong("project", project.getId());
+                        bundle.putString("project", project.id);
                     Navigation.findNavController(requireActivity(), R.id.fragment_container)
                             .navigate(R.id.nav_project_form, bundle);
                 } else if (item.getItemId() == R.id.item_delete) {
                     Project project = projects.get(position);
                     if (project != null) {
-                        Project.delete(project.getId());
+                        DB.deleteProject(project);
                     }
                 }
                 return true;
@@ -64,20 +62,20 @@ public class ProjectScreen extends Fragment {
             Bundle bundle = new Bundle();
             Project project = projects.get(position);
             if (project != null)
-                bundle.putString("project", project.getTitle());
+                bundle.putString("project", project.title);
             Navigation.findNavController(requireActivity(), R.id.fragment_container)
                     .navigate(R.id.nav_task, bundle);
         });
 
-        projectListener = (projectId, action) -> requireActivity().recreate();
-        Events.addProjectListener(projectListener);
+        projectListener = () -> requireActivity().recreate();
+        DB.addProjectListener(projectListener);
 
         return root;
     }
 
     @Override
     public void onDestroyView() {
-        Events.removeProjectListener(projectListener);
+        DB.removeProjectListener(projectListener);
         super.onDestroyView();
         binding = null;
     }
