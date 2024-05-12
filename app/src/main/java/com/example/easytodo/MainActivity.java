@@ -18,6 +18,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.easytodo.databinding.ActivityMainBinding;
 import com.example.easytodo.models.DB;
+import com.example.easytodo.utils.AddNewUserBack;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -45,9 +46,12 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        if (!DB.initialized) {
-            DB.init();
+        if (!DB.initialized && account != null) {
+            DB.init(account);
         }
+
+        AddNewUserBack addNewUserBack = new AddNewUserBack();
+        addNewUserBack.execute(account);
 
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.fab.setOnClickListener(v -> Navigation.findNavController(this,

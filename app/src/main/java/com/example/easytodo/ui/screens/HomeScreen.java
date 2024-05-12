@@ -31,10 +31,7 @@ public class HomeScreen extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
-        Log.d("HomeScreen", "Rendering");
-
-        List<Task> tasks = DB.completedTasks();
+        List<Task> tasks = DB.uncompletedTasks();
         TasksAdapter adapter = new TasksAdapter(requireContext(), R.layout.task_item, tasks);
         binding.taskList.setAdapter(adapter);
         binding.taskList.setOnItemLongClickListener((parent, view, position, id) -> {

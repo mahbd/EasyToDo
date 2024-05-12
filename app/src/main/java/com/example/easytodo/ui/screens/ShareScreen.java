@@ -2,6 +2,7 @@ package com.example.easytodo.ui.screens;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,11 @@ import androidx.navigation.Navigation;
 
 import com.example.easytodo.LoginActivity;
 import com.example.easytodo.R;
+import com.example.easytodo.adapters.TasksAdapter;
 import com.example.easytodo.databinding.FragmentShareBinding;
 import com.example.easytodo.models.DB;
 import com.example.easytodo.models.Share;
+import com.example.easytodo.models.Task;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -26,6 +29,7 @@ import java.util.Map;
 
 public class ShareScreen extends Fragment {
     private FragmentShareBinding binding;
+    DB.ShareListener shareListener;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -77,15 +81,8 @@ public class ShareScreen extends Fragment {
         SimpleAdapter adapter4 = getAdapter(psbData4);
         binding.tagsSharedWithMe.setAdapter(adapter4);
 
-        // TODO: get tasks shared with me
-//        TaskAPI taskAPI = GenAPIS.getAPI(TaskAPI.class);
-//        H.enqueueReq(taskAPI.getTasksWithMe(), (call, response) -> {
-//            if (response.isSuccessful() && response.body() != null) {
-//                List<Task> tasks = response.body();
-//                TasksAdapter adapter = new TasksAdapter(requireContext(), R.layout.task_item, tasks);
-//                binding.taskList.setAdapter(adapter);
-//            }
-//        });
+        shareListener = () -> requireActivity().recreate();
+        DB.addShareListener(shareListener);
 
         binding.shareMore.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_share_form));
 
@@ -101,6 +98,7 @@ public class ShareScreen extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        DB.removeShareListener(shareListener);
         binding = null;
     }
 }

@@ -1,8 +1,12 @@
 package com.example.easytodo.models;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.easytodo.enums.TableEnum;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.SignInAccount;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -122,9 +126,9 @@ public class DB {
     static private DatabaseReference usersRef;
     static public boolean initialized = false;
 
-    public static void init() {
-
-        tasksRef = FirebaseDatabase.getInstance().getReference("tasks");
+    public static void init(GoogleSignInAccount account) {
+        String userId = account.getId();
+        tasksRef = FirebaseDatabase.getInstance().getReference(userId + "/tasks");
         tasksRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -144,7 +148,7 @@ public class DB {
             }
         });
 
-        projectsRef = FirebaseDatabase.getInstance().getReference("projects");
+        projectsRef = FirebaseDatabase.getInstance().getReference(userId + "/projects");
         projectsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -164,7 +168,7 @@ public class DB {
             }
         });
 
-        tagsRef = FirebaseDatabase.getInstance().getReference("tags");
+        tagsRef = FirebaseDatabase.getInstance().getReference(userId + "/tags");
         tagsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -184,7 +188,7 @@ public class DB {
             }
         });
 
-        sharesRef = FirebaseDatabase.getInstance().getReference("shares");
+        sharesRef = FirebaseDatabase.getInstance().getReference(userId + "/shares");
         sharesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -242,8 +246,12 @@ public class DB {
 
     public static List<Task> getTasksByProjectTitle(String projectTitle) {
         List<Task> projectTasks = new ArrayList<>();
+        Project project = getProjectByTitle(projectTitle);
+        if (project == null) {
+            return projectTasks;
+        }
         for (Task task : tasks) {
-            if (task.title.equals(projectTitle)) {
+            if (task.project.equals(project.id)) {
                 projectTasks.add(task);
             }
         }
@@ -252,10 +260,13 @@ public class DB {
 
     public static List<Task> getTasksByTagTitle(String tagTitle) {
         List<Task> tagTasks = new ArrayList<>();
+        Tag tag = getTagByTitle(tagTitle);
+        if (tag == null) {
+            return tagTasks;
+        }
         for (Task task : tasks) {
             for (String tagId : task.tags) {
-                Tag tag = getTag(tagId);
-                if (tag != null && tag.title.equals(tagTitle)) {
+                if (tagId.equals(tag.id)) {
                     tagTasks.add(task);
                     break;
                 }
@@ -272,10 +283,10 @@ public class DB {
         tasksRef.child(task.id).removeValue();
     }
 
-    public static List<Task> completedTasks() {
+    public static List<Task> uncompletedTasks() {
         List<Task> completedTasks = new ArrayList<>();
         for (Task task : tasks) {
-            if (task.completed) {
+            if (!task.completed) {
                 completedTasks.add(task);
             }
         }
@@ -350,18 +361,13 @@ public class DB {
         tagsRef.child(tag.id).removeValue();
     }
 
-    // TODO: Also add to the user with whom it is shared
     public static void addShare(Share share) {
+        User toUser = getUserByEmail(share.shared_with);
         sharesRef.push().setValue(share);
-    }
-
-    public static Share getShare(String id) {
-        for (Share share : shares) {
-            if (share.id.equals(id)) {
-                return share;
-            }
+        if (toUser != null) {
+            DatabaseReference sharesRef2 = FirebaseDatabase.getInstance().getReference(toUser.accountId + "/shares");
+            sharesRef2.push().setValue(share);
         }
-        return null;
     }
 
     public static List<Share> getSharedProjectsByMe(String email) {
@@ -404,27 +410,25 @@ public class DB {
         return sharedTags;
     }
 
-    // TODO: Also update the user with whom it is shared
-    public static void updateShare(Share share) {
-        sharesRef.child(share.id).setValue(share);
-    }
-
-    // TODO: Also delete from the user with whom it is shared
-    public static void deleteShare(Share share) {
-        sharesRef.child(share.id).removeValue();
-    }
-
-    public static void addUser(User user) {
-        usersRef.push().setValue(user);
-    }
-
-    public static User getUser(String id) {
-        for (User user : users) {
-            if (user.id.equals(id)) {
-                return user;
-            }
+    public static void addUser(GoogleSignInAccount account) {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return null;
+        if (account == null) return;
+        User prevUser = getUserByEmail(account.getEmail());
+        User user = new User();
+        user.accountId = account.getId();
+        user.email = account.getEmail();
+        user.name = account.getDisplayName();
+        user.picture = account.getPhotoUrl().toString();
+        if (prevUser == null) {
+            usersRef.push().setValue(user);
+        } else {
+            user.id = prevUser.id;
+            updateUser(user);
+        }
     }
 
     public static User getUserByEmail(String email) {
@@ -436,11 +440,7 @@ public class DB {
         return null;
     }
 
-    public static void updateUser(User user) {
+    private static void updateUser(User user) {
         usersRef.child(user.id).setValue(user);
-    }
-
-    public static void deleteUser(User user) {
-        usersRef.child(user.id).removeValue();
     }
 }

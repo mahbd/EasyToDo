@@ -1,8 +1,10 @@
 package com.example.easytodo.models;
 
+
 public class User {
+    public String accountId;
     public String id;
     public String email;
-    private String first_name;
-    private String last_name;
+    public String name;
+    public String picture;
 }

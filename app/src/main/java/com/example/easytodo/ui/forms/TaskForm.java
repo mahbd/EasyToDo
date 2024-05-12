@@ -248,26 +248,11 @@ public class TaskForm extends Fragment {
             requireActivity().onBackPressed();
         });
 
-        taskListener = new DB.TaskListener() {
-            @Override
-            public void onTaskChanged() {
-                requireActivity().onBackPressed();
-            }
-        };
+        taskListener = () -> requireActivity().recreate();
 
-        projectListener = new DB.ProjectListener() {
-            @Override
-            public void onProjectChanged() {
-                requireActivity().onBackPressed();
-            }
-        };
+        projectListener = () -> requireActivity().recreate();
 
-        tagListener = new DB.TagListener() {
-            @Override
-            public void onTagChanged() {
-                requireActivity().onBackPressed();
-            }
-        };
+        tagListener = () -> requireActivity().recreate();
 
         DB.addTaskListener(taskListener);
         DB.addProjectListener(projectListener);
