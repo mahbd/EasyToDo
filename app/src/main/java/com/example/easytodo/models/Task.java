@@ -17,19 +17,6 @@ public class Task {
     public int reminder;
     public String project;
 
-    public Task() {
-        this.title = "";
-        this.description = "";
-        this.deadline = "";
-        this.duration = 0;
-        this.completed = false;
-        this.occurrence = 0;
-        this.priority = 0;
-        this.tags = null;
-        this.reminder = 0;
-        this.project = "";
-    }
-
     public String getDeadlineStr() {
         if (this.deadline == null || this.deadline.isEmpty()) {
             return "";
